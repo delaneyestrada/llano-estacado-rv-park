@@ -1,0 +1,38 @@
+$dark: lighten(black, 7%);
+$grey: lighten(black, 10%);
+$white: #f3f1e8;
+$navbar-bg: $dark;
+$border-radius: 1rem;
+
+$secondary: #5d1d09;
+$primary: #50adc0;
+$primary-bg: #030512;
+$tertiary: #652b41;
+$martel: 'Martel', serif;
+$montserrat: 'Montserrat', sans-serif;
+
+$card-bg: $secondary;
+
+$mobile-nav-height: 10vh;
+
+$grid-breakpoints: (
+  xs: 0,
+  sm: 576px,
+  md: 768px,
+  lg: 992px,
+  xl: 1200px,
+  xxl: 1920px,
+);
+
+$container-max-widths: (
+  sm: 540px,
+  md: 720px,
+  lg: 960px,
+  xl: 1140px,
+  xxl: 1920px,
+);
+
+$body-bg: $white;
+$body-color: $dark;
+
+$light: $white;

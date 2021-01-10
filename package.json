@@ -1,0 +1,32 @@
+{
+  "name": "llano-estacado-rv",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "nuxt",
+    "build": "nuxt build",
+    "start": "nuxt start",
+    "generate": "nuxt generate",
+    "lint:js": "eslint --ext .js,.vue --ignore-path .gitignore .",
+    "lint": "npm run lint:js"
+  },
+  "dependencies": {
+    "@nuxtjs/axios": "^5.12.2",
+    "bootstrap": "^4.5.2",
+    "bootstrap-vue": "^2.17.3",
+    "core-js": "^3.6.5",
+    "nuxt": "^2.14.6"
+  },
+  "devDependencies": {
+    "@fortawesome/free-brands-svg-icons": "^5.15.1",
+    "@fortawesome/free-solid-svg-icons": "^5.15.1",
+    "@nuxtjs/firebase": "^7.3.0",
+    "@nuxtjs/fontawesome": "^1.1.2",
+    "@nuxtjs/style-resources": "^1.0.0",
+    "firebase": "^8.2.2",
+    "sass": "^1.32.2",
+    "sass-loader": "^10.1.0",
+    "vue2-google-maps": "^0.10.7",
+    "vuelidate": "^0.7.6"
+  }
+}
