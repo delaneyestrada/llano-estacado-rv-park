@@ -81,6 +81,8 @@ export default {
           onAuthStateChangedAction: "onAuthStateChanged",
           ssr: false,
           disableEmulatorWarnings: false,
+          emulatorPort: 9099,
+          emulatorHost: "http://localhost",
         },
       },
     },

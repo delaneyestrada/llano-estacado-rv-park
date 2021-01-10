@@ -19,25 +19,12 @@
           <b-nav-item to="/contact">Contact</b-nav-item>
           <b-nav-item-dropdown right no-caret menu-class="user-dropdown">
             <template #button-content> Register </template>
-            <b-nav-form class="p-3" @submit.stop.prevent="registerForm">
+            <b-nav-form class="p-3" @submit.stop.prevent="createUser">
               <b-form-invalid-feedback
                 id="register-feedback"
                 :state="!this.register.error"
-                >Username and/or email already exists</b-form-invalid-feedback
+                >Email already exists</b-form-invalid-feedback
               >
-
-              <b-form-group label="Username" label-for="register-username">
-                <b-form-input
-                  id="register-username"
-                  type="text"
-                  :state="validateState('register.username')"
-                  data-form="register"
-                  v-model.trim="$v.register.username.$model"
-                ></b-form-input>
-                <b-form-invalid-feedback id="register-username-feedback"
-                  >Username is required</b-form-invalid-feedback
-                >
-              </b-form-group>
               <b-form-group label="Email" label-for="register-email">
                 <b-form-input
                   id="register-email"
@@ -89,7 +76,7 @@
           </b-nav-item-dropdown>
           <b-nav-item-dropdown right no-caret class="user-dropdown sign-in">
             <template #button-content> Sign In </template>
-            <b-nav-form class="p-3" @submit.stop.prevent="logIn">
+            <b-nav-form class="p-3" @submit.stop.prevent="signInUser">
               <b-form-invalid-feedback
                 id="sign-in-feedback"
                 :state="!this.signIn.error"
@@ -159,7 +146,6 @@ export default {
         error: false,
       },
       register: {
-        username: "",
         password: "",
         repeatPassword: "",
         email: "",
@@ -184,9 +170,6 @@ export default {
   },
   validations: {
     register: {
-      username: {
-        required,
-      },
       password: {
         required,
         minLength: minLength(8),
@@ -207,39 +190,36 @@ export default {
       const { $dirty, $error } = this.$v[objArr[0]][objArr[1]];
       return $dirty ? !$error : null;
     },
-    logIn({ authCreds = null }) {
-      if (authCreds) {
-        authCreds = null;
-      }
-      this.$gtag.event("login");
-      this.$store.dispatch("login", {
-        email: this.signIn.email,
-        password: this.signIn.password,
-      });
-    },
-    logOut() {
-      this.$store.dispatch("logout");
-      if (this.$route.name !== "home") {
-        this.$router.push({
-          path: "/",
-        });
+    async createUser() {
+      try {
+        await this.$fire.auth.createUserWithEmailAndPassword(
+          this.register.email,
+          this.register.password
+        );
+      } catch (e) {
+        alert(e);
       }
     },
-    registerForm() {
-      this.$v.register.$touch();
-      if (this.$v.register.$anyError) {
-        return;
+    async signInUser() {
+      try {
+        await this.$fire.auth.signInWithEmailAndPassword(
+          this.signIn.email,
+          this.signIn.password
+        );
+      } catch (e) {
+        alert(e);
       }
-      let registerData = {
-        username: this.register.username,
-        password: this.register.password,
-        email: this.register.email,
-      };
-      this.$store.dispatch("register", registerData);
+    },
+    async logout() {
+      try {
+        await this.$fire.auth.signOut();
+      } catch (e) {
+        alert(e);
+      }
     },
     async resetPassword(email = null) {
       try {
-        await auth.sendPasswordResetEmail(
+        await this.$fire.auth.sendPasswordResetEmail(
           email ? email : this.passwordReset.email
         );
         this.showSuccess = true;

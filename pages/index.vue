@@ -35,19 +35,18 @@
           </b-carousel-slide>
         </b-carousel>
         <div class="content p-3">
-          <b-card-text>
-            <h3>Info</h3>
-            <p>
-              Lorem ipsum dolor sit amet, consectetur adipisicing elit. Minus
-              qui quaerat eveniet! Corporis eos reiciendis corrupti optio fugit
-              quasi necessitatibus maiores est vitae voluptates officiis commodi
-              excepturi tenetur, libero autem.Doloribus aspernatur quae
-              consequatur asperiores quibusdam, pariatur rerum vero est sed
-              laboriosam accusamus! Nihil vero fugit esse, dignissimos
-              exercitationem in, explicabo molestiae soluta tempora minus vitae
-              asperiores voluptate, porro error.
-            </p>
-          </b-card-text>
+          <h3>Info</h3>
+          <p>
+            Lorem ipsum dolor sit amet, consectetur adipisicing elit. Minus qui
+            quaerat eveniet! Corporis eos reiciendis corrupti optio fugit quasi
+            necessitatibus maiores est vitae voluptates officiis commodi
+            excepturi tenetur, libero autem.Doloribus aspernatur quae
+            consequatur asperiores quibusdam, pariatur rerum vero est sed
+            laboriosam accusamus! Nihil vero fugit esse, dignissimos
+            exercitationem in, explicabo molestiae soluta tempora minus vitae
+            asperiores voluptate, porro error.
+          </p>
+
           <b-button variant="primary">About Us</b-button>
         </div>
       </b-card>
