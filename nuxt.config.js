@@ -52,6 +52,9 @@ export default {
     // { src: "~/plugins/firebase.js", ssr: true },
   ],
 
+  router: {
+    middleware: "router-auth",
+  },
   // Auto import components (https://go.nuxtjs.dev/config-components)
   components: true,
 
@@ -63,6 +66,7 @@ export default {
     // https://go.nuxtjs.dev/bootstrap
     "@nuxtjs/style-resources",
     "@nuxtjs/fontawesome",
+    "@nuxtjs/firebase",
     "bootstrap-vue/nuxt",
   ],
 
@@ -74,16 +78,19 @@ export default {
       storageBucket: "llano-estacado-rv-park.appspot.com",
       messagingSenderId: "967435769392",
       appId: "1:967435769392:web:ea0d2e6dcdfce13c93bff5",
+      databaseURL:
+        "https://llano-estacado-rv-park-default-rtdb.firebaseio.com/",
     },
     services: {
       auth: {
         initialize: {
           onAuthStateChangedAction: "onAuthStateChanged",
-          ssr: false,
+          ssr: true,
           disableEmulatorWarnings: false,
-          emulatorPort: 9099,
-          emulatorHost: "http://localhost",
         },
+      },
+      firestore: {
+        enablePersistence: true,
       },
     },
   },
