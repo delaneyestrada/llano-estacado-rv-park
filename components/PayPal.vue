@@ -49,28 +49,18 @@ export default {
         .Buttons({
           createSubscription: (data, actions) => {
             return actions.subscription.create({
-              //   payer: {
-              //     name: {
-              //       surname: this.$fire.auth.currentUser.uid,
-              //     },
-              //     email_address: this.$fire.auth.currentUser.email,
-              //   },
-              purchase_units: [
-                {
-                  description: this.product.description,
-                  amount: {
-                    currency_code: "USD",
-                    value: this.product.price,
-                  },
-                },
-              ],
+              plan_id: "P-6T250018KF833451VL77JVMQ",
             });
           },
           onApprove: async (data, actions) => {
-            const order = await actions.order.capture();
+            // const order = await actions.order.capture();
             this.data;
             this.paidFor = true;
-            console.log(order);
+            alert(
+              "You have successfully created subscription " +
+                data.subscriptionID
+            );
+            // console.log(order);
           },
           onError: (err) => {
             console.log(err);
