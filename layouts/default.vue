@@ -1,9 +1,28 @@
 <template>
   <div>
     <div class="info-bar">
-      <div class="info">Address: 155 Martha Drive, Buda TX</div>
-      <div class="info">Phone: (806) 777-1059</div>
-      <div class="info">Email: dillon.estrada55@gmail.com</div>
+      <div class="info">
+        <a href="#">
+          <div class="icon">
+            <font-awesome-icon :icon="['fas', 'map-marker-alt']" />
+          </div>
+        </a>
+        <span class="hide-small">155 Martha Drive, Buda TX</span>
+      </div>
+      <div class="info">
+        <div class="icon">
+          <font-awesome-icon :icon="['fas', 'phone-square']" />
+        </div>
+        <span>(806) 777-1059</span>
+      </div>
+      <div class="info">
+        <nuxt-link to="/contact">
+          <div class="icon">
+            <font-awesome-icon :icon="['fas', 'envelope']" />
+          </div>
+        </nuxt-link>
+        <span class="hide-small">dillon.estrada55@gmail.com</span>
+      </div>
     </div>
     <client-only>
       <b-navbar toggleable="lg">
@@ -13,11 +32,21 @@
 
         <b-collapse id="nav-collapse" is-nav>
           <b-navbar-nav class="ml-auto">
-            <b-nav-item to="/">Home</b-nav-item>
-            <b-nav-item to="/sites">Sites</b-nav-item>
-            <b-nav-item to="/about">About</b-nav-item>
-            <b-nav-item to="/things-to-do">Things To Do</b-nav-item>
-            <b-nav-item to="/contact">Contact</b-nav-item>
+            <b-nav-item to="/" :active="$route.path == '/'">Home</b-nav-item>
+            <b-nav-item to="/sites" :active="$route.path == '/sites'"
+              >Sites</b-nav-item
+            >
+            <b-nav-item to="/about" :active="$route.path == '/about'"
+              >About</b-nav-item
+            >
+            <b-nav-item
+              to="/things-to-do"
+              :active="$route.path == '/things-to-do'"
+              >Things To Do</b-nav-item
+            >
+            <b-nav-item to="/contact" :active="$route.path == '/contact'"
+              >Contact</b-nav-item
+            >
             <b-nav-item-dropdown
               v-if="isLoggedIn"
               right
@@ -289,8 +318,6 @@ export default {
 
 <style lang="scss">
 html {
-  font-family: "Source Sans Pro", -apple-system, BlinkMacSystemFont, "Segoe UI",
-    Roboto, "Helvetica Neue", Arial, sans-serif;
   font-size: 16px;
   word-spacing: 1px;
   -ms-text-size-adjust: 100%;
@@ -298,6 +325,9 @@ html {
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
   box-sizing: border-box;
+}
+body {
+  font-family: $montserrat;
 }
 
 .info-bar {
@@ -307,10 +337,31 @@ html {
 
 .info {
   background-color: $primary;
-  padding: 0.5em 0;
+  padding: 0.5em 1em;
   text-align: center;
   border-right: 2px solid rgba($white, 0.5);
   font-size: 0.8rem;
+  display: flex;
+  justify-content: center;
+  .icon {
+    margin-right: 0.5em;
+    font-size: 0.9rem;
+    color: $white;
+  }
+}
+.card {
+  color: $white;
+}
+@media screen and (max-width: 625px) {
+  .hide-small {
+    display: none;
+  }
+}
+a {
+  color: $white;
+  &:hover {
+    color: $white;
+  }
 }
 
 .form-group {

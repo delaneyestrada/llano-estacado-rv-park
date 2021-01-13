@@ -80,18 +80,7 @@ export default {
 };
 </script>
 
-<style scoped>
-/* #user {
-  display: grid;
-  grid-template-columns: 2fr 8fr;
-} */
-main {
-  /* display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 2em;
-  margin-top: 3em; */
-}
+<style lang="scss" scoped>
 button {
   margin: 1em;
 }

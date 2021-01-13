@@ -47,7 +47,7 @@
             asperiores voluptate, porro error.
           </p>
 
-          <b-button variant="primary">About Us</b-button>
+          <b-button variant="primary" to="/about">About Us</b-button>
         </div>
       </b-card>
     </main>

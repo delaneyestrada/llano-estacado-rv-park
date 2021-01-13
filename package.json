@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@nuxtjs/axios": "^5.12.2",
+    "@paypal/checkout-server-sdk": "^1.0.2",
     "bootstrap": "^4.5.2",
     "bootstrap-vue": "^2.17.3",
     "core-js": "^3.6.5",
@@ -24,9 +25,9 @@
     "@nuxtjs/fontawesome": "^1.1.2",
     "@nuxtjs/style-resources": "^1.0.0",
     "firebase": "^8.2.2",
+    "gmap-vue": "^1.5.0",
     "sass": "^1.32.2",
     "sass-loader": "^10.1.0",
-    "vue2-google-maps": "^0.10.7",
     "vuelidate": "^0.7.6"
   }
 }

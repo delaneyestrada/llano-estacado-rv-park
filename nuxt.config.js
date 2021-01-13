@@ -97,7 +97,7 @@ export default {
 
   fontawesome: {
     icons: {
-      solid: ["faHome", "faLaptopCode", "faBook", "faEnvelope"],
+      solid: ["faMapMarkerAlt", "faPhoneSquare", "faEnvelope"],
       brands: ["faGithub", "faInstagram"],
     },
   },
@@ -108,7 +108,7 @@ export default {
 
   // Build Configuration (https://go.nuxtjs.dev/config-build)
   build: {
-    transpile: [/^vue2-google-maps($|\/)/],
+    transpile: [/^gmap-vue($|\/)/],
   },
   generate: {},
 };

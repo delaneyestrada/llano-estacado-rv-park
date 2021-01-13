@@ -3,9 +3,9 @@
     <b-container>
       <h2 class="header mt-5 mb-2">Book Your Site</h2>
       <section id="site-picker">
-        <img src="https://via.placeholder.com/1920x1080" alt="" />
+        <SiteMap />
         <b-card>
-          <b-form @submit="onSubmit" @reset="onReset">
+          <b-form @submit="onSubmit">
             <b-form-group
               id="input-group-1"
               label="Email address:"
@@ -36,13 +36,25 @@
           </b-form>
         </b-card>
       </section>
+      <PayPal />
     </b-container>
   </div>
 </template>
 
 <script>
+import SiteMap from "@/components/SiteMap";
+import PayPal from "@/components/PayPal";
 export default {
   name: "Sites",
+  components: {
+    SiteMap,
+    PayPal,
+  },
+  methods: {
+    onSubmit() {
+      console.log("submitted");
+    },
+  },
 };
 </script>
 
