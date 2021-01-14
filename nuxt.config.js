@@ -3,6 +3,7 @@ import axios from "axios";
 export default {
   // Target (https://go.nuxtjs.dev/config-target)
   target: "static",
+  ssr: false,
   server: {
     port: 8088,
   },
@@ -51,7 +52,8 @@ export default {
 
   // Plugins to run before rendering page (https://go.nuxtjs.dev/config-plugins)
   plugins: [
-    { src: "~/plugins/google-maps", ssr: true },
+    { src: "~/plugins/google-maps", ssr: false },
+    { src: "~/plugins/v-calendar.js", ssr: false}
     // { src: "~/plugins/firebase.js", ssr: true },
   ],
 
@@ -62,7 +64,9 @@ export default {
   components: true,
 
   // Modules for dev and build (recommended) (https://go.nuxtjs.dev/config-modules)
-  buildModules: [],
+  buildModules: [
+    
+  ],
 
   // Modules (https://go.nuxtjs.dev/config-modules)
   modules: [
@@ -86,9 +90,9 @@ export default {
     },
     services: {
       auth: {
+        ssr: false,
         initialize: {
           onAuthStateChangedAction: "onAuthStateChanged",
-          ssr: true,
           disableEmulatorWarnings: false,
         },
       },

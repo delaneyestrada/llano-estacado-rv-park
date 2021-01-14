@@ -1,7 +1,8 @@
 export default {
   isLoggedIn: (state) => {
     try {
-      return state.authUser.id !== null
+      console.log('teeest')
+      return state.authUser.uid !== null
     } catch {
       return false
     }

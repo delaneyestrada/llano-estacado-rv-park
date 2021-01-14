@@ -1,72 +1,75 @@
 <template>
   <div>
-    <div v-if="!paidFor">
-      <h1>Buy this Lamp - ${{ product.price }} OBO</h1>
-
-      <p>{{ product.description }}</p>
-
-      <img
-        width="400"
-        src="https://images-na.ssl-images-amazon.com/images/I/61yZD4-mKjL._SX425_.jpg"
-      />
-    </div>
-
-    <div v-if="paidFor">
-      <h1>Noice, you bought a beautiful lamp!</h1>
-
-      <img src="https://media.giphy.com/media/j5QcmXoFWl4Q0/giphy.gif" />
-    </div>
-
     <div ref="paypal"></div>
   </div>
 </template>
 
 <script>
+import { mapState } from "vuex";
+
 export default {
   name: "PayPal",
   data() {
     return {
       loaded: false,
       paidFor: false,
-      product: {
-        price: 1.0,
-        description: "leg lamp from that one movie",
-        img: "./assets/lamp.jpg",
-      },
     };
+  },
+  props: ["submitState", "numMonths"],
+  computed: {
+    ...mapState({
+      authUser: (state) => state.authUser,
+    }),
   },
   mounted: function () {
     const script = document.createElement("script");
     script.src =
-      "https://www.paypal.com/sdk/js?client-id=ARNRNvgJTH0oaRUrQUC-p-MgCXzIOl5T6um6YqdW7U9mkwzV-ZkfCtp9c0QH6dRWArJY85Yh3rLCT5Vu&vault=true&intent=subscription";
+      "https://www.paypal.com/sdk/js?client-id=AXgplH_FFZXB5FWHAhjurvcisj0uXHjyHAQvUnrjlUmSD7g5E4kNTU60nNCEttnFSNYYdhlkv99e0f77&vault=true&intent=subscription";
     script.addEventListener("load", this.setLoaded);
     document.body.appendChild(script);
   },
   methods: {
     setLoaded: function () {
-      this.loaded = true;
-      window.paypal
-        .Buttons({
-          createSubscription: (data, actions) => {
-            return actions.subscription.create({
-              plan_id: "P-6T250018KF833451VL77JVMQ",
-            });
-          },
-          onApprove: async (data, actions) => {
-            // const order = await actions.order.capture();
-            this.data;
-            this.paidFor = true;
-            alert(
-              "You have successfully created subscription " +
-                data.subscriptionID
-            );
-            // console.log(order);
-          },
-          onError: (err) => {
-            console.log(err);
-          },
-        })
-        .render(this.$refs.paypal);
+      if (this.submitState == "Submitted") {
+        this.loaded = true;
+        window.paypal
+          .Buttons({
+            createSubscription: (data, actions) => {
+              console.log(this.numMonths.toString());
+              return actions.subscription.create({
+                "plan_id": "P-5CM02520BF7560243L77KBHY",
+                "custom_id": this.authUser.uid,
+                "plan": {
+                  "billing_cycles": [
+                    {
+                      "pricing_scheme": {
+                        "version": 1,
+                        "fixed_price": {
+                          "currency_code": "USD",
+                          "value": "2.00",
+                        },
+                      },
+                      "sequence": 1,
+                      "total_cycles": this.numMonths.toString(),
+                    },
+                  ],
+                },
+              });
+            },
+            onApprove: async (data, actions) => {
+              // const order = await actions.order.capture();
+              this.data;
+              this.paidFor = true;
+              this.$emit("success", data);
+            },
+            onError: (err) => {
+              console.log(err);
+            },
+          })
+          .render(this.$refs.paypal);
+      } else {
+        alert("Choose a start and end date to book your reservation");
+      }
     },
   },
 };

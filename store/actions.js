@@ -2,6 +2,7 @@ export default {
   async nuxtServerInit({ dispatch }, ctx) {
     // INFO -> Nuxt-fire Objects can be accessed in nuxtServerInit action via this.$fire___, ctx.$fire___ and ctx.app.$fire___'
     /** Get the VERIFIED authUser on the server */
+    console.log(ctx)
     if (ctx.res && ctx.res.locals && ctx.res.locals.user) {
       const { allClaims: claims, ...authUser } = ctx.res.locals.user;
 
@@ -11,12 +12,14 @@ export default {
         "Claims:",
         claims
       );
-
       await dispatch("onAuthStateChanged", {
         authUser,
         claims,
       });
     }
+  },
+  async setAuth({commit}, authUser) {
+    commit("SET_AUTH_USER", {authUser} )
   },
 
   async onAuthStateChanged({ commit }, { authUser }) {

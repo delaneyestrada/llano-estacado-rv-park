@@ -9,6 +9,7 @@ export default {
     state.authUser = {
       uid: authUser.uid,
       email: authUser.email,
+      isAdmin: authUser.email == "admin@admin.com" ? true : false
     };
   },
 };

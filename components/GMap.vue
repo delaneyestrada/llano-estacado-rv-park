@@ -1,6 +1,6 @@
 <template>
   <div>
-    <gmap-map :center="map.center" :zoom="15">
+    <gmap-map :center="map.center" satellite :zoom="12">
       <gmap-info-window
         :options="map.infoOptions"
         :position="map.infoWindowPos"
@@ -23,10 +23,10 @@ export default {
   data() {
     return {
       map: {
-        center: { lat: 33.5779, lng: -101.8552 },
+        center: { lat: 33.51529, lng: -101.80763 },
         marker: {
-          position: { lat: 33.5779, lng: -101.8552 },
-          infoText: `<div class='d-flex flex-column'><h6>Llano Estacado RV Park</h6><a class='btn btn-primary' target="_blank" href="https://www.google.com/maps/dir/?api=1&destination=33.5779,-101.8552">Get Directions</a></div>`,
+          position: { lat: 33.51529, lng: -101.80763 },
+          infoText: `<div class='d-flex flex-column'><h6>Llano Estacado RV Park</h6><a class='btn btn-primary' target="_blank" href="https://www.google.com/maps/dir/?api=1&destination=33.51529,-101.80763">Get Directions</a></div>`,
         },
         infoWindowPos: null,
         infoWinOpen: false,

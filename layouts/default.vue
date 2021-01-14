@@ -2,12 +2,15 @@
   <div>
     <div class="info-bar">
       <div class="info">
-        <a href="#">
+        <a
+          href="https://www.google.com/maps/dir/?api=1&destination=33.51529,-101.80763"
+          target="_blank"
+        >
           <div class="icon">
             <font-awesome-icon :icon="['fas', 'map-marker-alt']" />
           </div>
         </a>
-        <span class="hide-small">155 Martha Drive, Buda TX</span>
+        <span class="hide-small">2315 E CR 7130 Lubbock, TX 79404</span>
       </div>
       <div class="info">
         <div class="icon">
@@ -47,6 +50,12 @@
             <b-nav-item to="/contact" :active="$route.path == '/contact'"
               >Contact</b-nav-item
             >
+            <b-nav-item
+              to="/login"
+              v-if="!isLoggedIn"
+              :active="$route.path == '/login'"
+              >Sign In/Register</b-nav-item
+            >
             <b-nav-item-dropdown
               v-if="isLoggedIn"
               right
@@ -56,9 +65,12 @@
             >
               <template #button-content>User</template>
               <b-dropdown-item :to="`/dashboard`">Dashboard</b-dropdown-item>
+              <b-dropdown-item v-if="authUser.isAdmin" :to="`/admin`"
+                >Admin</b-dropdown-item
+              >
               <b-dropdown-item v-on:click="logout">Logout</b-dropdown-item>
             </b-nav-item-dropdown>
-            <b-nav-item-dropdown
+            <!-- <b-nav-item-dropdown
               v-if="!isLoggedIn"
               right
               no-caret
@@ -174,25 +186,12 @@
                   >Forgot Password</b-form-text
                 >
               </b-nav-form>
-            </b-nav-item-dropdown>
+            </b-nav-item-dropdown> -->
           </b-navbar-nav>
         </b-collapse>
       </b-navbar>
     </client-only>
     <Nuxt />
-    <b-modal
-      id="password-reset-modal"
-      title="Reset Password"
-      v-on:ok="resetPassword"
-    >
-      <b-form-group label="Email">
-        <b-form-input v-model="passwordReset.email"> </b-form-input>
-        <b-form-text
-          >Password reset link will be sent to the email you used to create the
-          account</b-form-text
-        >
-      </b-form-group>
-    </b-modal>
   </div>
 </template>
 
