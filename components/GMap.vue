@@ -1,6 +1,6 @@
 <template>
   <div>
-    <gmap-map :center="map.center" satellite :zoom="12">
+    <gmap-map :center="map.center" satellite :zoom="11">
       <gmap-info-window
         :options="map.infoOptions"
         :position="map.infoWindowPos"
@@ -40,11 +40,14 @@ export default {
       },
     };
   },
+  props: ["noInfoWindow"],
   methods: {
     toggleInfoWindow: function (marker) {
-      this.map.infoWindowPos = marker.position;
-      this.map.infoOptions.content = marker.infoText;
-      this.map.infoWinOpen = !this.map.infoWinOpen;
+      if (!this.noInfoWindow) {
+        this.map.infoWindowPos = marker.position;
+        this.map.infoOptions.content = marker.infoText;
+        this.map.infoWinOpen = !this.map.infoWinOpen;
+      }
     },
   },
 };

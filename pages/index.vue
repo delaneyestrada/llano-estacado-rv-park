@@ -2,31 +2,33 @@
   <div id="home">
     <div class="header">
       <div class="main">
-        <h1>Lubbock's Premium RV Park</h1>
-        <h2>(Tagline)</h2>
-        <b-button variant="primary">Book A Site</b-button>
+        <h1>Llano Estacado RV Park</h1>
+        <h2>Coming soon!</h2>
+        <!-- <b-button variant="primary">Book A Site</b-button> -->
       </div>
       <img src="@/static/rv-driving-llano.jpg" alt="" />
     </div>
     <main>
       <b-card no-body>
+        <GMap :noInfoWindow="true" />
+        <div class="card-content p-3 my-auto">
+          <ul>
+            <li>
+              Conveniently located near US-84 and US-87 as well as Loop 289
+            </li>
+            <li>Oversized RV spots to make sure your rig fits</li>
+            <li>Locally owned & operated</li>
+            <li>Easy booking online, by phone, or in person</li>
+          </ul>
+        </div>
+      </b-card>
+      <!-- <b-card no-body>
         <b-carousel
           id="carousel-1"
           controls
           background="#ababab"
           style="text-shadow: 1px 1px 2px #333"
         >
-          <!-- <b-carousel-slide >
-          <template #img>
-            <div class="img-container">
-              <img
-                class="d-block img-fluid w-100"
-                src="@/static/camper-site.jpg"
-                alt="image slot"
-              />
-            </div>
-          </template>
-        </b-carousel-slide> -->
           <b-carousel-slide img-src="@/static/camper-site.jpg">
           </b-carousel-slide>
           <b-carousel-slide img-src="@/static/front-rv-parked.jpg">
@@ -49,14 +51,19 @@
 
           <b-button variant="primary" to="/about">About Us</b-button>
         </div>
-      </b-card>
+      </b-card> -->
     </main>
   </div>
 </template>
 
 <script>
+import GMap from "@/components/GMap";
+
 export default {
   name: "Home",
+  components: {
+    GMap,
+  },
   data() {
     return {};
   },
@@ -114,7 +121,7 @@ export default {
   }
   .card {
     display: grid;
-    grid-template-columns: 1fr 2fr;
+    grid-template-columns: 1fr 1fr;
     width: 100%;
     border: 0;
   }
