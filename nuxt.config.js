@@ -53,7 +53,7 @@ export default {
   // Plugins to run before rendering page (https://go.nuxtjs.dev/config-plugins)
   plugins: [
     { src: "~/plugins/google-maps", ssr: false },
-    { src: "~/plugins/v-calendar.js", ssr: false}
+    { src: "~/plugins/v-calendar.js", ssr: false },
     // { src: "~/plugins/firebase.js", ssr: true },
   ],
 
@@ -64,9 +64,7 @@ export default {
   components: true,
 
   // Modules for dev and build (recommended) (https://go.nuxtjs.dev/config-modules)
-  buildModules: [
-    
-  ],
+  buildModules: [],
 
   // Modules (https://go.nuxtjs.dev/config-modules)
   modules: [
@@ -74,6 +72,7 @@ export default {
     "@nuxtjs/style-resources",
     "@nuxtjs/fontawesome",
     "@nuxtjs/firebase",
+    "@nuxtjs/axios",
     "bootstrap-vue/nuxt",
   ],
 

@@ -199,7 +199,6 @@
 import { mapState, mapGetters } from "vuex";
 import { validationMixin } from "vuelidate";
 import { required, minLength, sameAs, email } from "vuelidate/lib/validators";
-import { auth } from "@/plugins/firebase";
 
 export default {
   name: "App",
@@ -233,12 +232,8 @@ export default {
       isLoggedIn: "isLoggedIn",
     }),
   },
-  mounted() {
-    if (this.isLoggedIn) {
-      console.log(`Current User Email: ${this.$fire.auth.currentUser.email}`);
-    } else {
-      console.log("Not Logged In");
-    }
+  created() {
+    this.$store.dispatch("getSites");
   },
   validations: {
     register: {
@@ -294,7 +289,11 @@ export default {
     async logout() {
       try {
         await this.$fire.auth.signOut();
-        if (this.$route.path == "/admin" || this.$route.path == "/dashboard") {
+        if (
+          this.$route.path == "/admin" ||
+          this.$route.path == "/dashboard" ||
+          this.$route.path == "/payment"
+        ) {
           this.$router.push("/");
         }
       } catch (e) {

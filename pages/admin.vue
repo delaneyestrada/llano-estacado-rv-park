@@ -15,9 +15,15 @@
               <b-form-select
                 id="site-select"
                 v-model="site"
-                :options="selectOptions"
                 @change="clearBookingState"
-              ></b-form-select>
+              >
+                <b-form-select-option
+                  v-for="site in sites"
+                  :key="site.id"
+                  :value="site.id"
+                  >{{ site.id }}</b-form-select-option
+                >
+              </b-form-select>
               <v-calendar
                 is-expanded
                 :columns="$screens({ default: 1, xl: 2 })"
@@ -46,12 +52,15 @@
 </template>
 
 <script>
+import { mapState } from "vuex";
 import SiteMap from "@/components/SiteMap";
+
 export default {
   name: "admin",
   data() {
     return {
-      site: "A1",
+      site: "1",
+      sitesAdmin: [],
       bookingData: {
         user: {
           name: "",
@@ -62,14 +71,6 @@ export default {
           start: "",
         },
       },
-      selectOptions: [
-        { value: "A1", text: "A1" },
-        { value: "A2", text: "A2" },
-        { value: "A3", text: "A3" },
-        { value: "B1", text: "B1" },
-        { value: "B2", text: "B2" },
-        { value: "B3", text: "B3" },
-      ],
       calendarAttributes: [
         {
           // An optional key can be used for retrieving this attribute later,
@@ -110,7 +111,27 @@ export default {
   components: {
     SiteMap,
   },
+  computed: {
+    ...mapState({
+      sites: (state) => state.sites,
+    }),
+  },
+  created() {
+    this.getSitesAdmin();
+  },
   methods: {
+    async getSitesAdmin() {
+      const token = await this.$fire.auth.currentUser.getIdToken(true);
+      const response = await this.$axios.get(
+        "https://us-central1-llano-estacado-rv-park.cloudfunctions.net/webApi/sites",
+        {
+          headers: {
+            "Authorization": token,
+          },
+        }
+      );
+      this.sitesAdmin = response.data;
+    },
     onDayClick(e) {
       let startDate = e.attributes[0].dates[0].start;
       let endDate = e.attributes[0].dates[0].end;

@@ -11,11 +11,14 @@
               label="Site:"
               label-for="site-select"
             >
-              <b-form-select
-                id="site-select"
-                v-model="form.site"
-                :options="form.selectOptions"
-              ></b-form-select>
+              <b-form-select id="site-select" v-model="form.site" v-if="sites">
+                <b-form-select-option
+                  v-for="site in sites"
+                  :key="site.id"
+                  :value="site.id"
+                  >{{ site.id }}</b-form-select-option
+                >
+              </b-form-select>
             </b-form-group>
 
             <b-form-group
@@ -73,7 +76,7 @@
 <script>
 import { required, numeric } from "vuelidate/lib/validators";
 import { validationMixin } from "vuelidate";
-
+import { mapState, mapGetters } from "vuex";
 import SiteMap from "@/components/SiteMap";
 import PayPal from "@/components/PayPal";
 
@@ -84,17 +87,9 @@ export default {
   data() {
     return {
       form: {
-        site: "A1",
+        site: "1",
         startDate: "",
         numMonths: "",
-        selectOptions: [
-          // { value: "A1", text: "A1" },
-          // { value: "A2", text: "A2" },
-          // { value: "A3", text: "A3" },
-          // { value: "B1", text: "B1" },
-          // { value: "B2", text: "B2" },
-          // { value: "B3", text: "B3" },
-        ],
         error: false,
         submitState: "",
       },
@@ -104,10 +99,14 @@ export default {
     SiteMap,
     PayPal,
   },
-  created() {
-    let sites = this.$fire.firestore.collection("sites").get();
-    console.log(sites);
-    // this.form.selectOptions =
+  created() {},
+  computed: {
+    ...mapState({
+      sites: (state) => state.sites,
+    }),
+    ...mapGetters({
+      isLoggedIn: "isLoggedIn",
+    }),
   },
   validations: {
     form: {
@@ -133,7 +132,16 @@ export default {
         this.form.submitState = "Error";
       } else {
         this.form.submitState = "Submitted";
-        this.$bvModal.show("payment-modal");
+
+        if (!this.isLoggedIn) {
+          const reservationDetails = { ...this.form, redirectPayment: true };
+          this.$store.dispatch("setReservationDetails", reservationDetails);
+          this.$router.push("/login");
+        } else {
+          const reservationDetails = { ...this.form };
+          this.$store.dispatch("setReservationDetails", reservationDetails);
+          this.$router.push("/payment");
+        }
       }
     },
     onSubscribeSuccess() {

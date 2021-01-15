@@ -126,7 +126,7 @@
 <script>
 import { validationMixin } from "vuelidate";
 import { required, minLength, sameAs, email } from "vuelidate/lib/validators";
-import { auth } from "@/plugins/firebase";
+import { mapState } from "vuex";
 
 export default {
   name: "auth",
@@ -170,6 +170,11 @@ export default {
       },
     },
   },
+  computed: {
+    ...mapState({
+      reservationDetails: (state) => state.reservationDetails,
+    }),
+  },
   methods: {
     validateState(name) {
       let objArr = name.split(".");
@@ -188,6 +193,12 @@ export default {
           name: this.register.name,
           sites: [],
         });
+        const authUser = {
+          email: user.email,
+          uid: user.uid,
+        };
+        await this.$store.dispatch("setAuth", authUser);
+        this.redirect(user);
       } catch (e) {
         alert(e);
       }
@@ -203,15 +214,18 @@ export default {
           uid: user.uid,
         };
         await this.$store.dispatch("setAuth", authUser);
-        if (user.email == "admin@admin.com") {
-          this.$router.push("/admin");
-          console.log("admin");
-        } else if (user) {
-          this.$router.push("/dashboard");
-          console.log("user");
-        }
+        this.redirect(user);
       } catch (e) {
         alert(e);
+      }
+    },
+    async redirect(user) {
+      if (this.reservationDetails && this.reservationDetails.redirectPayment) {
+        this.$router.push("/payment");
+      } else if (user.email == "admin@admin.com") {
+        thhis.$router.push("/admin");
+      } else if (user) {
+        this.$router.push("/dashboard");
       }
     },
     async resetPassword(email = null) {
