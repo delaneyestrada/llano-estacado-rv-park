@@ -34,7 +34,7 @@ export default {
       {
         rel: "stylesheet",
         href:
-          "https://fonts.googleapis.com/css2?family=Martel:wght@400;700&family=Montserrat:wght@500;600;700;800;900&display=swap",
+          "https://fonts.googleapis.com/css2?family=Martel:wght@400;500;600;700&family=Montserrat:wght@500;600;700;800;900&display=swap",
       },
       {
         href: "https://unpkg.com/vueperslides/dist/vueperslides.css",

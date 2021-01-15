@@ -3,7 +3,7 @@
     <div class="header">
       <div class="main">
         <h1>Llano Estacado RV Park</h1>
-        <h2>Coming soon!</h2>
+        <h2>Coming soon to Lubbock, Texas!</h2>
         <!-- <b-button variant="primary">Book A Site</b-button> -->
       </div>
       <img src="@/static/rv-driving-llano.jpg" alt="" />
@@ -107,7 +107,7 @@ export default {
       left: 0;
       width: 100%;
       height: 100%;
-      background-color: rgba(#030512, 0.5);
+      background-color: rgba(#030512, 0.6);
     }
     .main {
       position: absolute;
@@ -119,9 +119,12 @@ export default {
       text-align: center;
       height: 50%;
       color: $white;
-      h1,
-      h2 {
+      h1 {
+        font-family: $martel;
         font-weight: 800;
+      }
+      h2 {
+        font-weight: 500;
       }
       .btn {
         font-weight: 600;
