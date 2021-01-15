@@ -16,7 +16,7 @@
             <li>
               Conveniently located near US-84 and US-87 as well as Loop 289
             </li>
-            <li>Oversized RV spots to make sure your rig fits</li>
+            <li>Oversized RV spots o make sure your rig fits</li>
             <li>Locally owned & operated</li>
             <li>Easy booking online, by phone, or in person</li>
           </ul>
