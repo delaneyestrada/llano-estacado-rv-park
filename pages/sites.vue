@@ -88,12 +88,12 @@ export default {
         startDate: "",
         numMonths: "",
         selectOptions: [
-          { value: "A1", text: "A1" },
-          { value: "A2", text: "A2" },
-          { value: "A3", text: "A3" },
-          { value: "B1", text: "B1" },
-          { value: "B2", text: "B2" },
-          { value: "B3", text: "B3" },
+          // { value: "A1", text: "A1" },
+          // { value: "A2", text: "A2" },
+          // { value: "A3", text: "A3" },
+          // { value: "B1", text: "B1" },
+          // { value: "B2", text: "B2" },
+          // { value: "B3", text: "B3" },
         ],
         error: false,
         submitState: "",
@@ -103,6 +103,11 @@ export default {
   components: {
     SiteMap,
     PayPal,
+  },
+  created() {
+    let sites = this.$fire.firestore.collection("sites").get();
+    console.log(sites);
+    // this.form.selectOptions =
   },
   validations: {
     form: {

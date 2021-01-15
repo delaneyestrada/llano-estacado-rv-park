@@ -1,14 +1,21 @@
 const functions = require("firebase-functions");
-
+const admin = require('firebase-admin')
 const paypal = require("@paypal/checkout-server-sdk");
 
+// Firebase Initialization
+admin.initializeApp({
+  credential: admin.credential.applicationDefault()
+});
+
+const db = admin.firestore()
+
 // Creating an environment
-let clientId =
+let paypalClientId =
   "AXgplH_FFZXB5FWHAhjurvcisj0uXHjyHAQvUnrjlUmSD7g5E4kNTU60nNCEttnFSNYYdhlkv99e0f77";
-let clientSecret =
+let paypalClientSecret =
   "EGDjdgtG8bepmIngcZYjtl0hIYEVVntmGBpBdDbnAdZJ39vRzd8BsQE-AarEOQ1fkRlazxKguic45TEx";
 // This sample uses SandboxEnvironment. In production, use LiveEnvironment
-let environment = new paypal.core.SandboxEnvironment(clientId, clientSecret);
+let environment = new paypal.core.SandboxEnvironment(paypalClientId, paypalClientSecret);
 let client = new paypal.core.PayPalHttpClient(environment);
 
 exports.createPayPalOrder = functions.https.onRequest((request, response) => {
@@ -39,3 +46,14 @@ exports.createPayPalOrder = functions.https.onRequest((request, response) => {
   };
   createOrder();
 });
+exports.getSites = functions.https.onRequest((request, response) => {
+  const sitesRef = db.collection('sites')
+  const allSites = sitesRef.get().then(snapshot => {
+    snapshot.forEach(doc => {
+      console.log(doc.id, '=>', doc.data())
+    })
+  })
+  .catch(err => {
+    console.log('Error getting documents', err)
+  })
+})
