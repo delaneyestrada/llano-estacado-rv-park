@@ -18,6 +18,9 @@
 </template>
 
 <script>
+// 3x14
+// Prorate to the 1st
+
 export default {
   name: "GMap",
   data() {

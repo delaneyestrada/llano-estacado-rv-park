@@ -36,6 +36,9 @@ export default {
     }
     commit("SET_AUTH_USER", { authUser });
   },
+  async setReservationDetails({commit}, details){
+    
+  },
 
   checkVuexStore(ctx) {
     if (this.$fire.auth === null) {
