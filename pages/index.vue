@@ -12,14 +12,30 @@
       <b-card no-body>
         <GMap :noInfoWindow="true" />
         <div class="card-content p-3 my-auto">
-          <ul>
-            <li>
-              Conveniently located near US-84 and US-87 as well as Loop 289
-            </li>
-            <li>Oversized RV spots to make sure your rig fits</li>
-            <li>Locally owned & operated</li>
-            <li>Easy booking online, by phone, or in person</li>
-          </ul>
+          <b-list-group>
+            <b-list-group-item>
+              <font-awesome-icon :icon="['fas', 'map-signs']" />
+              <span
+                >Conveniently located near US-84 and US-87 as well as Loop
+                289</span
+              >
+            </b-list-group-item>
+            <b-list-group-item>
+              <font-awesome-icon :icon="['fas', 'caravan']" />
+              <span
+                >Oversized RV spots to make sure your rig fits</span
+              ></b-list-group-item
+            >
+            <b-list-group-item>
+              <font-awesome-icon :icon="['fas', 'home']" />
+              <span>Locally owned & operated</span></b-list-group-item
+            >
+            <b-list-group-item>
+              <font-awesome-icon :icon="['fas', 'atlas']" /><span
+                >Easy booking online, by phone, or in person</span
+              ></b-list-group-item
+            >
+          </b-list-group>
         </div>
       </b-card>
       <!-- <b-card no-body>
@@ -74,9 +90,15 @@ export default {
 #home {
   .header {
     width: 100%;
-    height: 45vh;
+
     padding: 0;
     position: relative;
+    @media screen and (min-width: 800px) {
+      height: 45vh;
+    }
+    @media screen and (max-width: 800px) {
+      height: 30vh;
+    }
 
     &::before {
       content: "";
@@ -126,8 +148,45 @@ export default {
     border: 0;
   }
 }
+.main {
+  h1 {
+    font-size: clamp(1.7rem, 4vw, 2.5rem);
+  }
+  h2 {
+    font-size: clamp(1.2rem, 3vw, 2rem);
+  }
+}
 .card {
-  background-color: $secondary;
-  color: $white;
+  background-color: darken(white, 10%);
+  color: $dark;
+}
+.list-group-item {
+  color: $dark;
+  display: grid;
+  grid-template-areas: "a a";
+  grid-auto-columns: auto;
+  align-items: center;
+  span {
+    margin-left: 1rem;
+    font-size: clamp(0.8rem, 1.2vw, 1.1rem);
+  }
+  svg {
+    font-size: 2rem;
+  }
+}
+@media screen and (max-width: 850px) {
+  .card {
+    display: flex !important;
+    flex-direction: column !important;
+  }
+  main {
+    padding: 2rem !important;
+  }
+}
+@media screen and (max-width: 850px) {
+  main {
+    margin: 2rem 0;
+    padding: 0.5rem !important;
+  }
 }
 </style>

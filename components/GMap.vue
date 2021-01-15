@@ -54,8 +54,16 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.vue-map-container {
-  width: 100%;
-  height: 20rem;
+@media screen and (min-width: 420px) {
+  .vue-map-container {
+    width: 100%;
+    height: 20rem;
+  }
+}
+@media screen and (max-width: 420px) {
+  .vue-map-container {
+    width: 100%;
+    height: 15rem;
+  }
 }
 </style>

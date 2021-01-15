@@ -104,7 +104,7 @@ export default {
 
   fontawesome: {
     icons: {
-      solid: ["faMapMarkerAlt", "faPhoneSquare", "faEnvelope"],
+      solid: ["faMapMarkerAlt", "faPhoneSquare", "faEnvelope", "faCaravan", "faMapSigns", "faHome", "faAtlas"],
       brands: ["faGithub", "faInstagram"],
     },
   },
