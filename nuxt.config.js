@@ -53,7 +53,7 @@ export default {
   // Plugins to run before rendering page (https://go.nuxtjs.dev/config-plugins)
   plugins: [
     { src: "~/plugins/google-maps", ssr: false },
-    { src: "~/plugins/v-calendar.js", ssr: false}
+    { src: "~/plugins/v-calendar.js", ssr: false },
     // { src: "~/plugins/firebase.js", ssr: true },
   ],
 
@@ -64,9 +64,7 @@ export default {
   components: true,
 
   // Modules for dev and build (recommended) (https://go.nuxtjs.dev/config-modules)
-  buildModules: [
-    
-  ],
+  buildModules: [],
 
   // Modules (https://go.nuxtjs.dev/config-modules)
   modules: [
@@ -76,6 +74,10 @@ export default {
     "@nuxtjs/firebase",
     "bootstrap-vue/nuxt",
   ],
+  bootstrapVue: {
+    bootstrapCSS: false,
+    bootstrapVueCSS: false,
+  },
 
   firebase: {
     config: {
@@ -104,7 +106,15 @@ export default {
 
   fontawesome: {
     icons: {
-      solid: ["faMapMarkerAlt", "faPhoneSquare", "faEnvelope", "faCaravan", "faMapSigns", "faHome", "faAtlas"],
+      solid: [
+        "faMapMarkerAlt",
+        "faPhoneSquare",
+        "faEnvelope",
+        "faCaravan",
+        "faMapSigns",
+        "faHome",
+        "faAtlas",
+      ],
       brands: ["faGithub", "faInstagram"],
     },
   },
