@@ -15,11 +15,8 @@ export default {
       paidFor: false,
     };
   },
-  props: ["submitState", "numMonths"],
   computed: {
-    ...mapState({
-      authUser: (state) => state.authUser,
-    }),
+    ...mapState(["authUser", "reservationDetails"]),
   },
   mounted: function () {
     const script = document.createElement("script");
@@ -30,15 +27,15 @@ export default {
   },
   methods: {
     setLoaded: function () {
-      if (this.submitState == "Submitted") {
+      if (this.reservationDetails.submitState == "Submitted") {
         this.loaded = true;
         window.paypal
           .Buttons({
             createSubscription: (data, actions) => {
-              console.log(this.numMonths.toString());
+              console.log(this.reservationDetails.numMonths.toString());
               return actions.subscription.create({
                 "plan_id": "P-5CM02520BF7560243L77KBHY",
-                "custom_id": this.authUser.uid,
+                "custom_id": this.reservationDetails.site,
                 "plan": {
                   "billing_cycles": [
                     {
@@ -50,7 +47,7 @@ export default {
                         },
                       },
                       "sequence": 1,
-                      "total_cycles": this.numMonths.toString(),
+                      "total_cycles": this.reservationDetails.numMonths.toString(),
                     },
                   ],
                 },
@@ -58,7 +55,17 @@ export default {
             },
             onApprove: async (data, actions) => {
               // const order = await actions.order.capture();
-              this.data;
+              console.log(data);
+              const user = this.$fire.auth.currentUser;
+              this.$fire.firestore
+                .collection("users")
+                .doc(user.uid)
+                .collection("subscriptions")
+                .doc()
+                .set({
+                  id: data.subscriptionID,
+                  status: null,
+                });
               this.paidFor = true;
               this.$emit("success", data);
             },

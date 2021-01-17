@@ -46,7 +46,9 @@
         </div>
       </main>
     </b-tab>
-    <b-tab title="Sites"><b-card-text>Tab contents 2</b-card-text></b-tab>
+    <b-tab title="Billing">
+      <BillingTable />
+    </b-tab>
     <!-- <b-tab title="Tab 3"><b-card-text>Tab contents 3</b-card-text></b-tab> -->
   </b-tabs>
 </template>
@@ -54,6 +56,7 @@
 <script>
 import { mapState } from "vuex";
 import SiteMap from "@/components/SiteMap";
+import BillingTable from "@/components/BillingTable";
 
 export default {
   name: "admin",
@@ -110,6 +113,7 @@ export default {
   },
   components: {
     SiteMap,
+    BillingTable,
   },
   computed: {
     ...mapState({

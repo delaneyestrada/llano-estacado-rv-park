@@ -270,7 +270,6 @@ export default {
         await usersCollection.doc(user.uid).set({
           email: this.register.email,
           name: this.register.name,
-          sites: [],
         });
       } catch (e) {
         alert(e);

@@ -8,7 +8,7 @@
         <main>
           <h2>Profile</h2>
           <b-card no-body>
-            <b-tabs pills card vertical>
+            <b-tabs pills card>
               <b-tab title="Name" active
                 ><b-card-text>{{ name }}</b-card-text></b-tab
               >
@@ -28,7 +28,14 @@
           </b-card>
         </main>
       </b-tab>
-      <b-tab title="Sites"><b-card-text>Tab contents 2</b-card-text></b-tab>
+      <b-tab title="Billing">
+        <h2>Billing</h2>
+        <small
+          >Billing data can take a bit to update. If you don't see your booking
+          here yet, wait a few minutes and refresh the page.</small
+        >
+        <BillingTable :subscriptions="authUser.subscriptions" />
+      </b-tab>
       <!-- <b-tab title="Tab 3"><b-card-text>Tab contents 3</b-card-text></b-tab> -->
     </b-tabs>
   </div>
@@ -36,10 +43,13 @@
 
 <script>
 import { mapState } from "vuex";
+import BillingTable from "@/components/BillingTable";
 
 export default {
   name: "dashboard",
-
+  components: {
+    BillingTable,
+  },
   data() {
     return {
       dismissSeconds: 4,

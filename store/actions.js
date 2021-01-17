@@ -34,7 +34,33 @@ export default {
         console.error(e);
       }
     }
-    commit("SET_AUTH_USER", { authUser });
+
+    const subscriptions = await this.$fire.firestore
+      .collection("users")
+      .doc(authUser.uid)
+      .collection("subscriptions")
+      .get()
+      .then(function (querySnapshot) {
+        let docs = [];
+        querySnapshot.docs.forEach((doc) => {
+          docs.push(doc.data());
+        });
+        return docs;
+      });
+    let authUserObj = {
+      authUser: authUser,
+      subscriptions: subscriptions,
+      isAdmin: false,
+    };
+    if (
+      authUser &&
+      authUser.email == "admin@admin.com" &&
+      this.$fire.auth.currentUser.email == "admin@admin.com"
+    ) {
+      authUserObj.isAdmin = true;
+    }
+
+    commit("SET_AUTH_USER", authUserObj);
   },
   async setReservationDetails({ commit }, details) {
     console.log(details);

@@ -8,11 +8,7 @@
           {{ reservationDetails.numMonths }} months.
         </p>
         <p class="my-4">Select a payment method below.</p>
-        <PayPal
-          :submitState="reservationDetails.submitState"
-          :numMonths="reservationDetails.numMonths"
-          @success="onSubscribeSuccess"
-        />
+        <PayPal @success="onSubscribeSuccess" />
       </div>
     </b-card>
   </div>
@@ -29,7 +25,7 @@ export default {
   },
   methods: {
     onSubscribeSuccess() {
-      alert("success");
+      this.$router.push("/success");
     },
   },
 };

@@ -6,6 +6,10 @@
         <SiteMap />
         <b-card>
           <b-form @submit.stop.prevent="onSubmit">
+            <small class="d-block mb-3"
+              >Bookings are prorated to the first of the next month and then are
+              charged from month to month</small
+            >
             <b-form-group
               id="site-select-group"
               label="Site:"

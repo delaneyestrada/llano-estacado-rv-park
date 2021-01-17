@@ -75,6 +75,10 @@ export default {
     "@nuxtjs/axios",
     "bootstrap-vue/nuxt",
   ],
+  bootstrapVue: {
+    bootstrapCSS: false,
+    bootstrapVueCSS: false,
+  },
 
   firebase: {
     config: {
@@ -116,5 +120,7 @@ export default {
   build: {
     transpile: [/^gmap-vue($|\/)/],
   },
-  generate: {},
+  generate: {
+    fallback: true,
+  },
 };

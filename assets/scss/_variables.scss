@@ -8,8 +8,8 @@ $secondary: #5d1d09;
 $primary: #50adc0;
 $primary-bg: #030512;
 $tertiary: #652b41;
-$martel: 'Martel', serif;
-$montserrat: 'Montserrat', sans-serif;
+$martel: "Martel", serif;
+$montserrat: "Montserrat", sans-serif;
 
 $card-bg: $secondary;
 
@@ -36,3 +36,6 @@ $body-bg: $white;
 $body-color: $dark;
 
 $light: $white;
+
+@import "~/node_modules/bootstrap/scss/bootstrap.scss";
+@import "~/node_modules/bootstrap-vue/src/index.scss";

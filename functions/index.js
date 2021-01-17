@@ -27,7 +27,58 @@ let environment = new paypal.core.SandboxEnvironment(
   paypalClientSecret
 );
 let client = new paypal.core.PayPalHttpClient(environment);
+app.post("/paypal", async (request, response) => {
+  let duplicate = false;
+  const webhooksReference = db.collection("webhooks");
+  const usersReference = db.collection("users");
+  const subscriptionGroupReference = db.collectionGroup("subscriptions");
 
+  webhooksReference
+    .where("id", "==", request.body.id)
+    .get()
+    .then(function (querySnapshot) {
+      if (!querySnapshot.docs.length) {
+        duplicate = true;
+      }
+    });
+  if (duplicate) {
+    console.log("DUPLICATE");
+    response.status(400).send("Webhook Duplicate");
+  } else {
+    const body = request.body;
+    const resource = body.resource;
+
+    const subscriptionId = resource.id;
+
+    let updateDoc = {
+      lastAction: body.summary,
+      status: resource.status,
+      site: resource.custom_id,
+      created: resource.create_time,
+    };
+    let userRef;
+
+    if (resource.links) {
+      updateDoc = { ...updateDoc, links: resource.links };
+    }
+    if (resource.update_time) {
+      updateDoc = { ...updateDoc, lastUpdated: resource.update_time };
+    }
+    subscriptionGroupReference
+      .where("id", "==", subscriptionId)
+      .get()
+      .then(function (querySnapshot) {
+        if (!querySnapshot.empty) {
+          const doc = querySnapshot.docs[0];
+          const docRef = doc.ref.update(updateDoc);
+        }
+      });
+
+    console.log(subscriptionId);
+    webhooksReference.add({ id: request.body.id });
+    response.status(200).send("Ok");
+  }
+});
 app.get("/payment", async (request, response) => {
   // Here, OrdersCreateRequest() creates a POST request to /v2/checkout/orders
   let orderRequest = new paypal.orders.OrdersCreateRequest();

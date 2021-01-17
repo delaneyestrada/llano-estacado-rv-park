@@ -8,12 +8,23 @@ export default {
     console.log(state);
   },
 
-  SET_AUTH_USER: (state, { authUser }) => {
-    state.authUser = {
+  SET_AUTH_USER: (
+    state,
+    { authUser, subscriptions = null, isAdmin = false }
+  ) => {
+    let newState = {
       uid: authUser.uid,
       email: authUser.email,
-      isAdmin: authUser.email == "admin@admin.com" ? true : false,
+      isAdmin: isAdmin,
+      subscriptions: subscriptions,
     };
+    // if (subscriptions) {
+    //   newState = { ...newState, subscriptions };
+    // }
+    if (state.authUser) {
+      newState = Object.assign(state.authUser, newState);
+    }
+    state.authUser = newState;
   },
   SET_RESERVATION_DETAILS: (state, details) => {
     state.reservationDetails = details;

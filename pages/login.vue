@@ -26,7 +26,7 @@
                   v-model="signIn.password"
                 ></b-form-input>
               </b-form-group>
-              <b-button type="submit" variant="secondary"> Sign In </b-button>
+              <b-button type="submit" variant="primary"> Sign In </b-button>
               <b-form-text
                 class="ml-3"
                 tag="a"
@@ -101,7 +101,7 @@
                   >Does not match password</b-form-invalid-feedback
                 >
               </b-form-group>
-              <b-button type="submit" variant="secondary"> Register </b-button>
+              <b-button type="submit" variant="primary"> Register </b-button>
             </b-form>
           </b-tab>
         </b-tabs>
@@ -223,7 +223,7 @@ export default {
       if (this.reservationDetails && this.reservationDetails.redirectPayment) {
         this.$router.push("/payment");
       } else if (user.email == "admin@admin.com") {
-        thhis.$router.push("/admin");
+        this.$router.push("/admin");
       } else if (user) {
         this.$router.push("/dashboard");
       }
