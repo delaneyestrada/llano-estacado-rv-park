@@ -107,7 +107,7 @@ export default {
       left: 0;
       width: 100%;
       height: 100%;
-      background-color: rgba(#030512, 0.6);
+      background-color: rgba(#030512, 0.7);
     }
     .main {
       position: absolute;
