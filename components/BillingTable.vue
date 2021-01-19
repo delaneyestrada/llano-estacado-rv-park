@@ -82,12 +82,14 @@ export default {
   },
   props: {
     subscriptions: {
-      default: [],
+      default: function () {
+        return [];
+      },
     },
   },
   created() {
     if (this.authUser.isAdmin) {
-      this.fields = [...this.fields, { key: "actions", label: "Actions" }];
+      // this.fields = [...this.fields, { key: "actions", label: "Actions" }];
     }
   },
   methods: {

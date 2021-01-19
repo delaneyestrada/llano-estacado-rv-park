@@ -6,12 +6,14 @@
     "dev": "nuxt",
     "build": "nuxt build",
     "start": "nuxt start",
+    "emulators": "firebase emulators:start --import ./emulator-data/firestore-data/2021-01-17T05:44:02_69",
     "generate": "nuxt generate",
     "lint:js": "eslint --ext .js,.vue --ignore-path .gitignore .",
     "lint": "npm run lint:js"
   },
   "dependencies": {
     "@nuxtjs/axios": "^5.12.2",
+    "@nuxtjs/dayjs": "^1.3.0",
     "@nuxtjs/pwa": "^3.3.4",
     "@paypal/checkout-server-sdk": "^1.0.2",
     "bootstrap": "^4.5.2",

@@ -66,11 +66,22 @@ export default {
     console.log(details);
     commit("SET_RESERVATION_DETAILS", details);
   },
-  async getSites({ commit }) {
+  async getSites({ commit, state }) {
     try {
+      if (state.authUser.isAdmin) {
+      } else {
+        this.$fire.firestore
+          .collection("sites")
+          .onSnapshot(function (snapshot) {
+            snapshot.docs.forEach((doc) => {
+              console.log(doc);
+            });
+          });
+      }
       const response = await this.$axios.get(
-        "https://us-central1-llano-estacado-rv-park.cloudfunctions.net/webApi/sites"
+        `${this.$config.functionsURL}/webApi/sites`
       );
+
       // const response = await this.$axios.get(
       //   "http://localhost:5001/llano-estacado-rv-park/us-central1/webApi/sites"
       // );

@@ -3,6 +3,7 @@ const admin = require("firebase-admin");
 const paypal = require("@paypal/checkout-server-sdk");
 const express = require("express");
 const cors = require("cors");
+const axios = require("axios");
 
 // Firebase Initialization
 admin.initializeApp({
@@ -21,6 +22,13 @@ let paypalClientId =
   "AXgplH_FFZXB5FWHAhjurvcisj0uXHjyHAQvUnrjlUmSD7g5E4kNTU60nNCEttnFSNYYdhlkv99e0f77";
 let paypalClientSecret =
   "EGDjdgtG8bepmIngcZYjtl0hIYEVVntmGBpBdDbnAdZJ39vRzd8BsQE-AarEOQ1fkRlazxKguic45TEx";
+
+// Sandbox URL
+let paypalAPI = "https://api-m.sandbox.paypal.com";
+
+// Production URL
+// let paypalAPI = "https://api-m.paypal.com"
+
 // This sample uses SandboxEnvironment. In production, use LiveEnvironment
 let environment = new paypal.core.SandboxEnvironment(
   paypalClientId,
@@ -79,6 +87,36 @@ app.post("/paypal", async (request, response) => {
     response.status(200).send("Ok");
   }
 });
+
+app.get("/subscriptions", async (request, response) => {
+  let { authorized, userData } = await checkAuth(request);
+
+  if (authorized) {
+    const subscriptionGroupReference = db.collectionGroup("subscriptions");
+    subscriptionGroupReference.get().then((querySnapshot) => {
+      const docs = querySnapshot.docs.map((doc) => {
+        return doc.data();
+      });
+      let data = [];
+      docs.forEach((doc) => {
+        console.log(doc);
+        db.collection("users")
+          .doc(doc.uid)
+          .get()
+          .then((documentSnapshot) => {
+            data = [
+              ...data,
+              { subscription: doc, user: documentSnapshot.data() },
+            ];
+          });
+      });
+      response.status(200).send(data);
+    });
+  } else {
+    response.status(500).send("Not Authorized");
+  }
+});
+
 app.get("/payment", async (request, response) => {
   // Here, OrdersCreateRequest() creates a POST request to /v2/checkout/orders
   let orderRequest = new paypal.orders.OrdersCreateRequest();
@@ -105,28 +143,11 @@ app.get("/payment", async (request, response) => {
 });
 
 app.get("/sites", async (request, response) => {
-  let authorized = false;
-  let userData = null;
-  if (request.headers.authorization) {
-    try {
-      userData = await admin
-        .auth()
-        .verifyIdToken(request.headers.authorization);
-      authorized = true;
-    } catch (e) {
-      console.log(e);
-    }
-  }
+  let { authorized, userData } = checkAuth(request);
+
   const sitesRef = db.collection("sites");
   const snapshot = await sitesRef.get();
-  // .then((snapshot) => {
-  //   snapshot.forEach((doc) => {
-  //     console.log(doc.id, "=>", doc.data());
-  //   });
-  // })
-  // .catch((err) => {
-  //   console.log("Error getting documents", err);
-  // });
+
   let data = snapshot.docs.map((doc) => doc.data());
   if (!authorized || !userData.email == "admin@admin.com") {
     data = data.map((doc) => {
@@ -138,7 +159,76 @@ app.get("/sites", async (request, response) => {
     return a.id - b.id;
   });
 
-  response.send(data);
+  response.status(200).send(data);
 });
 
+async function checkAuth(request) {
+  let authorized = false;
+  let userData = null;
+  if (request.headers.authorization) {
+    try {
+      userData = await admin
+        .auth()
+        .verifyIdToken(request.headers.authorization);
+      authorized = true;
+    } catch (e) {
+      return { authorized: authorized, userData: userData, error: e };
+    }
+  }
+  return { authorized: authorized, userData: userData };
+}
+async function generatePaypalAccessToken() {
+  try {
+    const {
+      data: { access_token },
+    } = await axios({
+      url: `${paypalAPI}/v1/oauth2/token`,
+      method: "post",
+      headers: {
+        Accept: "application/json",
+        "Accept-Language": "en_US",
+        "content-type": "application/x-www-form-urlencoded",
+      },
+      auth: {
+        username: paypalClientId,
+        password: paypalClientSecret,
+      },
+      params: {
+        grant_type: "client_credentials",
+      },
+    });
+
+    console.log("access_token: ", access_token);
+    return access_token;
+  } catch (e) {
+    return e;
+  }
+}
+
 exports.webApi = functions.https.onRequest(app);
+
+exports.firestorePaypalSync = functions.firestore
+  .document("users/{user}/subscriptions/{subscription}")
+  .onWrite((change, context) => {
+    try {
+      const status = change.after.get("status");
+      const site = change.after.get("site");
+      const subscriptionID = change.after.get("id");
+      db.collection("sites")
+        .doc(site)
+        .collection("bookings")
+        .where("paypalSubscriptionID", "==", subscriptionID)
+        .get()
+        .then(function (querySnapshot) {
+          if (!querySnapshot.empty) {
+            const doc = querySnapshot.docs[0];
+            const docRef = doc.ref.update({
+              status,
+            });
+          }
+        });
+      return true;
+    } catch {
+      return false;
+    }
+  });

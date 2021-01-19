@@ -57,15 +57,55 @@ export default {
               // const order = await actions.order.capture();
               console.log(data);
               const user = this.$fire.auth.currentUser;
-              this.$fire.firestore
-                .collection("users")
-                .doc(user.uid)
-                .collection("subscriptions")
-                .doc()
-                .set({
-                  id: data.subscriptionID,
-                  status: null,
-                });
+
+              try {
+                const db = this.$fire.firestore;
+                const FieldValue = this.$fireModule.firestore.FieldValue;
+
+                db.collection("users")
+                  .doc(user.uid)
+                  .collection("subscriptions")
+                  .doc()
+                  .set({
+                    uid: user.uid,
+                    id: data.subscriptionID,
+                    status: "Initiated",
+                  });
+
+                const startDate = this.$dayjs(
+                  this.reservationDetails.startDate
+                );
+                const endDate = startDate.add(
+                  this.reservationDetails.numMonths,
+                  "month"
+                );
+
+                const bookDates = {
+                  start: startDate.toISOString(),
+                  end: endDate.toISOString(),
+                  paypalSubscriptionID: data.subscriptionID,
+                };
+
+                db.collection("sites")
+                  .doc(this.reservationDetails.site)
+                  .update("booked", FieldValue.arrayUnion(bookDates));
+
+                db.collection("sites")
+                  .doc(this.reservationDetails.site)
+                  .collection("bookings")
+                  .doc()
+                  .set({
+                    paypalSubscriptionID: data.subscriptionID,
+                    startDate: this.reservationDetails.startDate,
+                    numMonths: this.reservationDetails.numMonths,
+                    status: "Initiated",
+                    admin: {
+                      userID: user.uid,
+                    },
+                  });
+              } catch (e) {
+                console.log(e);
+              }
               this.paidFor = true;
               this.$emit("success", data);
             },

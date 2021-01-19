@@ -12,17 +12,19 @@ let firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 
 var db = firebase.firestore();
+db.useEmulator("localhost", 8080);
 var batch = db.batch();
 let array = [];
 for (i = 0; i < 42; i++) {
   array.push({
     id: i + 1,
     admin: {},
+    booked: [],
   });
 }
 console.log(array);
-array.forEach((doc) => {
-  batch.set(db.collection("sites").doc(), doc);
+array.forEach((doc, i) => {
+  batch.set(db.collection("sites").doc((i + 1).toString()), doc);
 });
 // Commit the batch
 batch.commit().then(function () {

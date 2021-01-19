@@ -34,6 +34,9 @@
                 id="start-date-input"
                 v-model.trim="$v.form.startDate.$model"
                 :state="validateState('form.startDate')"
+                :date-format-options="dateOptions"
+                :min="today"
+                :max="oneYearFromNow"
               ></b-form-datepicker>
               <b-form-invalid-feedback v-if="!$v.form.startDate.required"
                 >Start date is required</b-form-invalid-feedback
@@ -97,6 +100,12 @@ export default {
         error: false,
         submitState: "",
       },
+      dateOptions: {
+        month: "long",
+        day: "numeric",
+        year: "numeric",
+      },
+      today: new Date(),
     };
   },
   components: {
@@ -111,6 +120,9 @@ export default {
     ...mapGetters({
       isLoggedIn: "isLoggedIn",
     }),
+    oneYearFromNow() {
+      return new Date(new Date().setFullYear(new Date().getFullYear() + 1));
+    },
   },
   validations: {
     form: {

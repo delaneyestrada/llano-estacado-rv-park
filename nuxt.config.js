@@ -7,6 +7,13 @@ export default {
   server: {
     port: 8088,
   },
+  publicRuntimeConfig: {
+    functionsURL:
+      process.env.NODE_ENV == "development"
+        ? process.env.FIREBASE_FUNCTIONS_DEV
+        : process.env.FIREBASE_FUNCTIONS_PROD,
+    firestoreURL: process.env.FIRESTORE,
+  },
 
   // Global page headers (https://go.nuxtjs.dev/config-head)
   head: {
@@ -41,10 +48,6 @@ export default {
         rel: "stylesheet",
       },
     ],
-    // script: [{
-    //   charset: "utf-8",
-    //   src: "https://widget.bandsintown.com/main.min.js",
-    // }, ]
   },
 
   // Global CSS (https://go.nuxtjs.dev/config-css)
@@ -54,7 +57,6 @@ export default {
   plugins: [
     { src: "~/plugins/google-maps", ssr: false },
     { src: "~/plugins/v-calendar.js", ssr: false },
-    // { src: "~/plugins/firebase.js", ssr: true },
   ],
 
   router: {
@@ -68,12 +70,12 @@ export default {
 
   // Modules (https://go.nuxtjs.dev/config-modules)
   modules: [
-    // https://go.nuxtjs.dev/bootstrap
     "@nuxtjs/style-resources",
     "@nuxtjs/fontawesome",
     "@nuxtjs/firebase",
     "@nuxtjs/axios",
     "bootstrap-vue/nuxt",
+    "@nuxtjs/dayjs",
   ],
   bootstrapVue: {
     bootstrapCSS: false,
@@ -98,9 +100,19 @@ export default {
           onAuthStateChangedAction: "onAuthStateChanged",
           disableEmulatorWarnings: false,
         },
+        emulatorPort: process.env.NODE_ENV === "development" ? 9099 : undefined,
+        emulatorHost: "http://localhost",
       },
       firestore: {
         enablePersistence: true,
+        settings: {
+          host:
+            process.env.NODE_ENV === "development"
+              ? "localhost:8080"
+              : undefined,
+          ssl: process.env.NODE_ENV === "development" ? false : undefined,
+        },
+        // emulatorPort: process.env.NODE_ENV === "development" ? 8080 : undefined,
       },
     },
   },

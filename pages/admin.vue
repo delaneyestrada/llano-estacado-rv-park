@@ -47,7 +47,7 @@
       </main>
     </b-tab>
     <b-tab title="Billing">
-      <BillingTable />
+      <BillingTable :subscriptions="subscriptions" />
     </b-tab>
     <!-- <b-tab title="Tab 3"><b-card-text>Tab contents 3</b-card-text></b-tab> -->
   </b-tabs>
@@ -64,6 +64,7 @@ export default {
     return {
       site: "1",
       sitesAdmin: [],
+      subscriptions: [],
       bookingData: {
         user: {
           name: "",
@@ -122,12 +123,26 @@ export default {
   },
   created() {
     this.getSitesAdmin();
+    this.getSubscriptions();
   },
   methods: {
+    async getSubscriptions() {
+      const token = await this.$fire.auth.currentUser.getIdToken(true);
+      const response = await this.$axios.get(
+        `${this.$config.functionsURL}/webApi/subscriptions`,
+        {
+          headers: {
+            "Authorization": token,
+          },
+        }
+      );
+      console.log(response);
+      // this.subscriptions = subscriptions;
+    },
     async getSitesAdmin() {
       const token = await this.$fire.auth.currentUser.getIdToken(true);
       const response = await this.$axios.get(
-        "https://us-central1-llano-estacado-rv-park.cloudfunctions.net/webApi/sites",
+        `${this.$config.functionsURL}/webApi/sites`,
         {
           headers: {
             "Authorization": token,
