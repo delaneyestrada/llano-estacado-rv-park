@@ -68,7 +68,7 @@ export default {
   },
   async getSites({ commit, state }) {
     try {
-      if (state.authUser.isAdmin) {
+      if (state.authUser && state.authUser.isAdmin) {
       } else {
         this.$fire.firestore
           .collection("sites")

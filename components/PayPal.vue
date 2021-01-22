@@ -55,37 +55,51 @@ export default {
             },
             onApprove: async (data, actions) => {
               // const order = await actions.order.capture();
-              console.log(data);
-              const user = this.$fire.auth.currentUser;
 
+              const db = this.$fire.firestore;
+              const FieldValue = this.$fireModule.firestore.FieldValue;
+
+              const authUser = this.$fire.auth.currentUser;
+
+              const fbUser = await db
+                .collection("users")
+                .doc(authUser.uid)
+                .get()
+                .then((documentSnapshot) => {
+                  return documentSnapshot.data();
+                });
+              const user = { ...fbUser, uid: authUser.uid };
+              console.log("user", user);
               try {
-                const db = this.$fire.firestore;
-                const FieldValue = this.$fireModule.firestore.FieldValue;
-
                 db.collection("users")
                   .doc(user.uid)
                   .collection("subscriptions")
                   .doc()
                   .set({
-                    uid: user.uid,
+                    admin: {
+                      uid: user.uid,
+                      userEmail: user.email,
+                      userName: user.name,
+                    },
                     id: data.subscriptionID,
                     status: "Initiated",
                   });
+              } catch (e) {
+                console.log("add subscription error", e);
+              }
 
-                const startDate = this.$dayjs(
-                  this.reservationDetails.startDate
-                );
-                const endDate = startDate.add(
-                  this.reservationDetails.numMonths,
-                  "month"
-                );
+              const startDate = this.$dayjs(this.reservationDetails.startDate);
+              const endDate = startDate.add(
+                this.reservationDetails.numMonths,
+                "month"
+              );
 
-                const bookDates = {
-                  start: startDate.toISOString(),
-                  end: endDate.toISOString(),
-                  paypalSubscriptionID: data.subscriptionID,
-                };
-
+              const bookDates = {
+                start: startDate.toISOString(),
+                end: endDate.toISOString(),
+                paypalSubscriptionID: data.subscriptionID,
+              };
+              try {
                 db.collection("sites")
                   .doc(this.reservationDetails.site)
                   .update("booked", FieldValue.arrayUnion(bookDates));
@@ -100,12 +114,15 @@ export default {
                     numMonths: this.reservationDetails.numMonths,
                     status: "Initiated",
                     admin: {
-                      userID: user.uid,
+                      uid: user.uid,
+                      userEmail: user.email,
+                      userName: user.name,
                     },
                   });
               } catch (e) {
-                console.log(e);
+                console.log("Site/booking add error", e);
               }
+
               this.paidFor = true;
               this.$emit("success", data);
             },

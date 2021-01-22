@@ -17,6 +17,7 @@ export default {
       email: authUser.email,
       isAdmin: isAdmin,
       subscriptions: subscriptions,
+      name: authUser.name,
     };
     // if (subscriptions) {
     //   newState = { ...newState, subscriptions };

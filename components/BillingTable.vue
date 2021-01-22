@@ -48,11 +48,6 @@ export default {
   name: "billing-table",
   data() {
     return {
-      fields: [
-        { key: "site", label: "Site", sortable: true },
-        { key: "created", label: "Date Booked", sortable: true },
-        { key: "status", label: "Status", sortable: true },
-      ],
       currentPage: 1,
       perPage: 5,
       sortBy: "",
@@ -67,7 +62,13 @@ export default {
     subscriptionsCopy() {
       if (this.subscriptions) {
         const subscriptions = JSON.parse(JSON.stringify(this.subscriptions));
-        return subscriptions;
+        const newSubscriptions = subscriptions.map((subscription) => {
+          return {
+            ...subscription,
+            created: this.$dayjs(subscription.created).format("MM/DD/YYYY"),
+          };
+        });
+        return newSubscriptions;
       } else {
         return null;
       }
@@ -79,6 +80,21 @@ export default {
         return 0;
       }
     },
+    fields() {
+      let fields = [
+        { key: "site", label: "Site", sortable: true },
+        { key: "created", label: "Date Booked", sortable: true },
+        { key: "status", label: "Status", sortable: true },
+      ];
+      if (this.authUser && this.authUser.isAdmin) {
+        fields = [
+          ...fields,
+          { key: "admin.userName", label: "Name", sortable: true },
+          { key: "admin.userEmail", label: "Email", sortable: true },
+        ];
+      }
+      return fields;
+    },
   },
   props: {
     subscriptions: {
@@ -88,9 +104,13 @@ export default {
     },
   },
   created() {
-    if (this.authUser.isAdmin) {
-      // this.fields = [...this.fields, { key: "actions", label: "Actions" }];
-    }
+    // if (this.authUser.isAdmin) {
+    //   this.fields = [
+    //     ...this.fields,
+    //     { key: "admin.userName", label: "Name", sortable: true },
+    //     { key: "admin.userEmail", label: "Email", sortable: true },
+    //   ];
+    // }
   },
   methods: {
     filterLinks(links, rel) {

@@ -75,41 +75,41 @@ export default {
           start: "",
         },
       },
-      calendarAttributes: [
-        {
-          // An optional key can be used for retrieving this attribute later,
-          // and will most likely be derived from your data object
-          key: "1",
-          // Attribute type definitions
-          highlight: "red", // Boolean, String, Object
-          content: "black", // Boolean, String, Object
-          popover: {
-            label: "Jane Doe",
-            visibility: "hover",
-            hideIndicator: true,
-          },
-          // Your custom data object for later access, if needed
-          customData: {
-            user: {
-              uid: 1,
-              name: "Jane Doe",
-            },
-          },
-          // We also need some dates to know where to display the attribute
-          // We use a single date here, but it could also be an array of dates,
-          //  a date range or a complex date pattern.
-          dates: [
-            {
-              start: new Date(),
-              end: new Date(new Date().setMonth(new Date().getMonth() + 8)),
-            },
-          ],
-          // You can optionally provide dates to exclude
-          excludeDates: null,
-          // Think of `order` like `z-index`
-          order: 0,
-        },
-      ],
+      // calendarAttributes: [
+      //   {
+      //     // An optional key can be used for retrieving this attribute later,
+      //     // and will most likely be derived from your data object
+      //     key: "1",
+      //     // Attribute type definitions
+      //     highlight: "red", // Boolean, String, Object
+      //     content: "black", // Boolean, String, Object
+      //     popover: {
+      //       label: "Jane Doe",
+      //       visibility: "hover",
+      //       hideIndicator: true,
+      //     },
+      //     // Your custom data object for later access, if needed
+      //     customData: {
+      //       user: {
+      //         uid: 1,
+      //         name: "Jane Doe",
+      //       },
+      //     },
+      //     // We also need some dates to know where to display the attribute
+      //     // We use a single date here, but it could also be an array of dates,
+      //     //  a date range or a complex date pattern.
+      //     dates: [
+      //       {
+      //         start: new Date(),
+      //         end: new Date(new Date().setMonth(new Date().getMonth() + 8)),
+      //       },
+      //     ],
+      //     // You can optionally provide dates to exclude
+      //     excludeDates: null,
+      //     // Think of `order` like `z-index`
+      //     order: 0,
+      //   },
+      // ],
     };
   },
   components: {
@@ -120,8 +120,73 @@ export default {
     ...mapState({
       sites: (state) => state.sites,
     }),
+    calendarAttributes() {
+      let site = {};
+      if (this.sitesAdmin) {
+        site = this.sitesAdmin.filter((obj) => {
+          return obj.id == this.site;
+        });
+        console.log(site[0]);
+      } else {
+        return {};
+      }
+      site = site[0];
+      if (!site?.booked) {
+        console.log("test");
+        return {};
+      }
+      const attributes = site.booked.map((booking) => {
+        let subscription = {};
+
+        if (this.subscriptions) {
+          subscription = this.subscriptions.filter((obj) => {
+            return obj.id == booking.paypalSubscriptionID;
+          });
+        } else {
+          return {};
+        }
+        subscription = subscription[0];
+        return {
+          // An optional key can be used for retrieving this attribute later,
+          // and will most likely be derived from your data object
+          key: subscription.id,
+          // Attribute type definitions
+          highlight: "red", // Boolean, String, Object
+          content: "black", // Boolean, String, Object
+          popover: {
+            label: subscription.admin?.userName,
+            visibility: "hover",
+            hideIndicator: true,
+          },
+          // Your custom data object for later access, if needed
+          customData: {
+            user: {
+              uid: subscription.admin?.uid,
+              email: subscription.admin?.userEmail,
+              name: subscription.admin?.userName,
+              paymentStatus: subscription.status,
+            },
+          },
+          // We also need some dates to know where to display the attribute
+          // We use a single date here, but it could also be an array of dates,
+          //  a date range or a complex date pattern.
+          dates: [
+            {
+              start: this.$dayjs(booking.start).toDate(),
+              end: this.$dayjs(booking.end).toDate(),
+            },
+          ],
+          // You can optionally provide dates to exclude
+          excludeDates: null,
+          // Think of `order` like `z-index`
+          order: 0,
+        };
+      });
+      return attributes;
+    },
   },
   created() {
+    // Add local storage to minimize function calls with JSON.stringify and JSON.parse
     this.getSitesAdmin();
     this.getSubscriptions();
   },
@@ -136,8 +201,8 @@ export default {
           },
         }
       );
-      console.log(response);
-      // this.subscriptions = subscriptions;
+      const subscriptions = response.data;
+      this.subscriptions = subscriptions;
     },
     async getSitesAdmin() {
       const token = await this.$fire.auth.currentUser.getIdToken(true);

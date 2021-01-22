@@ -93,25 +93,15 @@ app.get("/subscriptions", async (request, response) => {
 
   if (authorized) {
     const subscriptionGroupReference = db.collectionGroup("subscriptions");
-    subscriptionGroupReference.get().then((querySnapshot) => {
-      const docs = querySnapshot.docs.map((doc) => {
-        return doc.data();
+    const data = await subscriptionGroupReference
+      .get()
+      .then((querySnapshot) => {
+        const docs = querySnapshot.docs.map((doc) => {
+          return doc.data();
+        });
+        return docs;
       });
-      let data = [];
-      docs.forEach((doc) => {
-        console.log(doc);
-        db.collection("users")
-          .doc(doc.uid)
-          .get()
-          .then((documentSnapshot) => {
-            data = [
-              ...data,
-              { subscription: doc, user: documentSnapshot.data() },
-            ];
-          });
-      });
-      response.status(200).send(data);
-    });
+    response.status(200).send(data);
   } else {
     response.status(500).send("Not Authorized");
   }
