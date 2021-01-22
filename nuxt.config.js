@@ -9,91 +9,91 @@ export default {
   },
 
   // Global page headers (https://go.nuxtjs.dev/config-head)
-  head: {
-    title: "Llano Estacado RV Park | Lubbock, TX",
-    meta: [
-      {
-        charset: "utf-8",
-      },
-      {
-        name: "viewport",
-        content: "width=device-width, initial-scale=1",
-      },
-      {
-        hid: "description",
-        name: "description",
-        content:
-          "Llano Estacado RV Park is the place to park your RV in Lubbock, TX. Convenient location, oversized spots, and locally owned.",
-      },
-      {
-        hid: "twitter:title",
-        name: "twitter:title",
-        content: "Llano Estacado RV Park | Lubbock, TX",
-      },
-      {
-        hid: "twitter:description",
-        name: "twitter:description",
-        content:
-          "Llano Estacado RV Park is the place to park your RV in Lubbock, TX. Convenient location, oversized spots, and locally owned.",
-      },
-      {
-        hid: "twitter:image",
-        name: "twitter:image",
-        content: "https://www.llanoestacadorvpark.com/rv-driving-llano.jpg",
-      },
-      {
-        hid: "twitter:image:alt",
-        name: "twitter:image:alt",
-        content: "Llano Estacado RV Park | Lubbock, TX",
-      },
-      {
-        hid: "og:title",
-        property: "og:title",
-        content: "Llano Estacado RV Park | Lubbock, TX",
-      },
-      {
-        hid: "og:description",
-        property: "og:description",
-        content:
-          "Llano Estacado RV Park is the place to park your RV in Lubbock, TX. Convenient location, oversized spots, and locally owned.",
-      },
-      {
-        hid: "og:image",
-        property: "og:image",
-        content: "https://www.llanoestacadorvpark.com/rv-driving-llano.jpg",
-      },
-      {
-        hid: "og:image:secure_url",
-        property: "og:image:secure_url",
-        content: "https://www.llanoestacadorvpark.com/rv-driving-llano.jpg",
-      },
-      {
-        hid: "og:image:alt",
-        property: "og:image:alt",
-        content: "Llano Estacado RV Park | Lubbock, TX",
-      },
-    ],
-    link: [
-      {
-        rel: "icon",
-        type: "image/x-icon",
-        href: "/favicon.ico",
-      },
-      {
-        rel: "stylesheet",
-        href:
-          "https://fonts.googleapis.com/css2?family=Martel:wght@400;500;600;700&family=Montserrat:wght@500;600;700;800;900&display=swap",
-      },
-      {
-        href: "https://unpkg.com/vueperslides/dist/vueperslides.css",
-        rel: "stylesheet",
-      },
-    ],
-    // script: [{
-    //   charset: "utf-8",
-    //   src: "https://widget.bandsintown.com/main.min.js",
-    // }, ]
-  },
+  // head: {
+  //   title: "Llano Estacado RV Park | Lubbock, TX",
+  //   meta: [
+  //     {
+  //       charset: "utf-8",
+  //     },
+  //     {
+  //       name: "viewport",
+  //       content: "width=device-width, initial-scale=1",
+  //     },
+  //     {
+  //       hid: "description",
+  //       name: "description",
+  //       content:
+  //         "Llano Estacado RV Park is the place to park your RV in Lubbock, TX. Convenient location, oversized spots, and locally owned.",
+  //     },
+  //     {
+  //       hid: "twitter:title",
+  //       name: "twitter:title",
+  //       content: "Llano Estacado RV Park | Lubbock, TX",
+  //     },
+  //     {
+  //       hid: "twitter:description",
+  //       name: "twitter:description",
+  //       content:
+  //         "Llano Estacado RV Park is the place to park your RV in Lubbock, TX. Convenient location, oversized spots, and locally owned.",
+  //     },
+  //     {
+  //       hid: "twitter:image",
+  //       name: "twitter:image",
+  //       content: "https://www.llanoestacadorvpark.com/rv-driving-llano.jpg",
+  //     },
+  //     {
+  //       hid: "twitter:image:alt",
+  //       name: "twitter:image:alt",
+  //       content: "Llano Estacado RV Park | Lubbock, TX",
+  //     },
+  //     {
+  //       hid: "og:title",
+  //       property: "og:title",
+  //       content: "Llano Estacado RV Park | Lubbock, TX",
+  //     },
+  //     {
+  //       hid: "og:description",
+  //       property: "og:description",
+  //       content:
+  //         "Llano Estacado RV Park is the place to park your RV in Lubbock, TX. Convenient location, oversized spots, and locally owned.",
+  //     },
+  //     {
+  //       hid: "og:image",
+  //       property: "og:image",
+  //       content: "https://www.llanoestacadorvpark.com/rv-driving-llano.jpg",
+  //     },
+  //     {
+  //       hid: "og:image:secure_url",
+  //       property: "og:image:secure_url",
+  //       content: "https://www.llanoestacadorvpark.com/rv-driving-llano.jpg",
+  //     },
+  //     {
+  //       hid: "og:image:alt",
+  //       property: "og:image:alt",
+  //       content: "Llano Estacado RV Park | Lubbock, TX",
+  //     },
+  //   ],
+  //   link: [
+  //     {
+  //       rel: "icon",
+  //       type: "image/x-icon",
+  //       href: "/favicon.ico",
+  //     },
+  //     {
+  //       rel: "stylesheet",
+  //       href:
+  //         "https://fonts.googleapis.com/css2?family=Martel:wght@400;500;600;700&family=Montserrat:wght@500;600;700;800;900&display=swap",
+  //     },
+  //     {
+  //       href: "https://unpkg.com/vueperslides/dist/vueperslides.css",
+  //       rel: "stylesheet",
+  //     },
+  //   ],
+  //   // script: [{
+  //   //   charset: "utf-8",
+  //   //   src: "https://widget.bandsintown.com/main.min.js",
+  //   // }, ]
+  // },
 
   // Global CSS (https://go.nuxtjs.dev/config-css)
   css: [],

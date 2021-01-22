@@ -1,6 +1,6 @@
 <template>
   <div>
-    <Nuxt />
+    <Nuxt v-if="publish" />
   </div>
 </template>
 
@@ -16,6 +16,7 @@ export default {
 
   data() {
     return {
+      publish: false,
       signIn: {
         email: "",
         password: "",
