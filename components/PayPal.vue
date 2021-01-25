@@ -15,6 +15,12 @@ export default {
       paidFor: false,
     };
   },
+  props: {
+    monthlyRate: {
+      type: Number,
+      default: 0,
+    },
+  },
   computed: {
     ...mapState(["authUser", "reservationDetails"]),
   },
@@ -28,25 +34,60 @@ export default {
   methods: {
     setLoaded: function () {
       if (this.reservationDetails.submitState == "Submitted") {
+        const monthlyRate = 100.0;
+        const startDate = this.$dayjs(this.reservationDetails.startDate);
+        const startNextMonth = startDate.add(1, "month").date(1);
+        console.log(startDate, startNextMonth);
+        const numDaysUntilNextMonth = startNextMonth.diff(startDate, "day");
+        const daysInMonth = startDate.daysInMonth();
+        let proratedCharge =
+          (numDaysUntilNextMonth / daysInMonth) * monthlyRate;
+        proratedCharge = proratedCharge.toFixed(2);
+        console.log(proratedCharge);
+        console.log(numDaysUntilNextMonth);
         this.loaded = true;
         window.paypal
           .Buttons({
             createSubscription: (data, actions) => {
-              console.log(this.reservationDetails.numMonths.toString());
               return actions.subscription.create({
-                "plan_id": "P-5CM02520BF7560243L77KBHY",
+                "plan_id": "P-0K585564PM541093LMAHLK5Q",
                 "custom_id": this.reservationDetails.site,
+                "start_time": startDate.toISOString(),
                 "plan": {
+                  "product_id": "rv-spot",
+                  "name": "RV Reservation",
+                  "description": "RV Reservation",
                   "billing_cycles": [
                     {
                       "pricing_scheme": {
                         "version": 1,
                         "fixed_price": {
                           "currency_code": "USD",
-                          "value": "2.00",
+                          "value": proratedCharge,
                         },
                       },
+                      "frequency": {
+                        "interval_unit": "DAY",
+                        "interval_count": numDaysUntilNextMonth,
+                      },
+                      "tenure_type": "TRIAL",
                       "sequence": 1,
+                      "total_cycles": 1,
+                    },
+                    {
+                      "pricing_scheme": {
+                        "version": 1,
+                        "fixed_price": {
+                          "currency_code": "USD",
+                          "value": monthlyRate.toString(),
+                        },
+                      },
+                      "frequency": {
+                        "interval_unit": "MONTH",
+                        "interval_count": 1,
+                      },
+                      "tenure_type": "REGULAR",
+                      "sequence": 2,
                       "total_cycles": this.reservationDetails.numMonths.toString(),
                     },
                   ],
@@ -54,8 +95,6 @@ export default {
               });
             },
             onApprove: async (data, actions) => {
-              // const order = await actions.order.capture();
-
               const db = this.$fire.firestore;
               const FieldValue = this.$fireModule.firestore.FieldValue;
 

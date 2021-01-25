@@ -1,6 +1,6 @@
 <template>
   <div id="site-map">
-    <b-form inline id="top-form">
+    <b-form inline id="top-form" @submit.prevent.stop="onSubmit">
       <label class="mr-sm-2" for="start-date-input">Start Date: </label>
       <b-form-datepicker
         id="start-date-input"
@@ -31,7 +31,19 @@
       >
       <label class="mr-sm-2 ml-3" for="site-select">Site:</label>
 
-      <b-form-select id="site-select" v-model="form.site" v-if="sites">
+      <b-form-select
+        id="site-select"
+        v-model="form.site"
+        v-if="validSites.length"
+      >
+        <b-form-select-option
+          v-for="site in validSites"
+          :key="site.id"
+          :value="site.id"
+          >{{ site.id }}</b-form-select-option
+        >
+      </b-form-select>
+      <b-form-select id="site-select" v-model="form.site" v-else>
         <b-form-select-option
           v-for="site in sites"
           :key="site.id"
@@ -44,85 +56,21 @@
         >Book It</b-button
       >
     </b-form>
-    <div id="canvas" ref="container">
-      <Konva-stage :config="configKonva" class="stage" ref="stage">
-        <Konva-layer v-if="canvas.sites.length">
-          <Konva-rect
-            v-for="site in canvas.sites"
-            :key="site.id"
-            :config="{
-              x: site.x,
-              y: site.y,
-              id: site.id,
-              draggable: false,
-              width: 25,
-              height: 50,
-              fill: 'grey',
-            }"
-          >
-          </Konva-rect>
-        </Konva-layer>
-      </Konva-stage>
+    <div
+      id="canvas"
+      ref="container"
+      v-resize="onContainerResize"
+      @select-object="handleCanvasClick"
+      class="mb-5"
+    >
+      <fabric-canvas
+        id="fabric-container"
+        class="fabric-container"
+        ref="canvas"
+        v-bind="canvasEl"
+      >
+      </fabric-canvas>
     </div>
-    <!-- <b-card>
-      <b-form @submit.stop.prevent="onSubmit">
-        <small class="d-block mb-3"
-          >Bookings are prorated to the first of the next month and then are
-          charged from month to month</small
-        >
-        <b-form-group
-          id="site-select-group"
-          label="Site:"
-          label-for="site-select"
-        >
-          <b-form-select id="site-select" v-model="form.site" v-if="sites">
-            <b-form-select-option
-              v-for="site in sites"
-              :key="site.id"
-              :value="site.id"
-              >{{ site.id }}</b-form-select-option
-            >
-          </b-form-select>
-        </b-form-group>
-
-        <b-form-group
-          id="start-date-group"
-          label="Start Date:"
-          label-for="start-date-input"
-        >
-          <b-form-datepicker
-            id="start-date-input"
-            v-model.trim="$v.form.startDate.$model"
-            :state="validateState('form.startDate')"
-            :date-format-options="dateOptions"
-            :min="today"
-            :max="oneYearFromNow"
-          ></b-form-datepicker>
-          <b-form-invalid-feedback v-if="!$v.form.startDate.required"
-            >Start date is required</b-form-invalid-feedback
-          >
-        </b-form-group>
-        <b-form-group
-          id="num-months-group"
-          label="Number of months:"
-          label-for="num-months-input"
-        >
-          <b-form-input
-            id="num-months-input"
-            v-model.trim="$v.form.numMonths.$model"
-            :state="validateState('form.numMonths')"
-          ></b-form-input>
-          <b-form-invalid-feedback v-if="!$v.form.numMonths.required"
-            >Number of months is required</b-form-invalid-feedback
-          >
-          <b-form-invalid-feedback v-if="!$v.form.numMonths.numeric"
-            >Number of months must be a number</b-form-invalid-feedback
-          >
-        </b-form-group>
-
-        <b-button type="submit" variant="primary">Submit</b-button>
-      </b-form>
-    </b-card> -->
     <b-modal id="payment-modal" hide-footer title="Reservation Details">
       <p class="my-4">
         You are about to rent site {{ form.site }} starting on
@@ -142,6 +90,8 @@
 import { required, numeric } from "vuelidate/lib/validators";
 import { validationMixin } from "vuelidate";
 import { mapState, mapGetters } from "vuex";
+import resize from "vue-resize-directive";
+import { fabric } from "fabric";
 import PayPal from "@/components/PayPal";
 
 export default {
@@ -151,18 +101,10 @@ export default {
   data() {
     return {
       windowWidth: window.innerWidth,
-      configKonva: {
-        width: 0,
-        height: 0,
-        scale: {
-          x: 1,
-          y: 1,
-        },
-      },
       form: {
         site: "1",
-        startDate: "",
-        numMonths: "",
+        startDate: new Date(),
+        numMonths: 1,
         error: false,
         submitState: "",
       },
@@ -172,6 +114,12 @@ export default {
         year: "numeric",
       },
       today: new Date(),
+      canvasEl: {
+        width: 1000,
+        height: 562.5,
+        // viewportTransform: [1, 0, 0, 1, 0, 0],
+      },
+      validSites: [],
       canvas: {
         sites: [],
       },
@@ -183,19 +131,11 @@ export default {
       default: false,
     },
   },
+  directives: {
+    resize,
+  },
   components: {
     PayPal,
-  },
-  watch: {
-    "configKonva.width": function (newWidth, oldWidth) {
-      this.canvas.sites = this.canvas.sites.map((site) => {
-        return {
-          ...site,
-          x: newWidth / 2,
-          y: newWidth / 2,
-        };
-      });
-    },
   },
   computed: {
     ...mapState({
@@ -219,53 +159,309 @@ export default {
       },
     },
   },
+  watch: {
+    "form.site"(newSite) {
+      const canvasSites = this.getCanvasSites();
+      const canvas = this.$refs.canvas.canvas;
+      canvasSites.valid.forEach((site) => {
+        const rect = site.getObjects("rect")[0];
 
-  mounted() {
-    const container = this.$refs.container;
-    const width = container.offsetWidth;
-    const height = container.offsetHeight;
-    const stage = this.$refs.stage;
-    this.configKonva.width = width;
-    this.configKonva.height = width * 0.5625;
-
-    if (this.admin) {
-      console.log("Admin");
-    }
-    // this.resizeStage();
-    container.addEventListener("resize", this.onCanvasResize);
-    window.addEventListener("resize", this.onResize);
-
-    for (let i = 0; i < 1; i++) {
-      console.log(this.configKonva);
-      this.canvas.sites.push({
-        id: i + 1,
-        x: this.configKonva.width / 2,
-        y: this.configKonva.height / 2,
+        if (site.name == newSite) {
+          rect.set("fill", "#ffff00");
+        } else {
+          rect.set("fill", "#00ff00");
+        }
       });
+      canvas.renderAll();
+    },
+  },
+  mounted() {
+    this.$watch(
+      (vm) => [vm.form.numMonths, vm.form.startDate],
+      (val) => {
+        this.validSites = this.sites.filter((site) => {
+          const bookings = site?.booked;
+          let formStartDate = this.$dayjs(this.form.startDate);
+          const formEndDate = formStartDate
+            .add(this.form.numMonths, "month")
+            .toDate();
+          formStartDate = formStartDate.toDate();
+          let overlappingBookings = [];
+          if (bookings) {
+            overlappingBookings = bookings.filter((booking) => {
+              const bookingStartDate = this.$dayjs(booking.start).toDate();
+              const bookingEndDate = this.$dayjs(booking.end).toDate();
+              const overlap = this.dateRangeOverlaps(
+                formStartDate,
+                formEndDate,
+                bookingStartDate,
+                bookingEndDate
+              );
+              console.log(bookingStartDate, bookingEndDate, overlap);
+              if (overlap) {
+                return true;
+              }
+            });
+
+            if (!overlappingBookings.length) {
+              return site;
+            }
+          }
+        });
+        const canvasSites = this.getCanvasSites();
+        const canvas = this.$refs.canvas.canvas;
+        canvasSites.valid.forEach((site) => {
+          const rect = site.getObjects("rect")[0];
+          rect.set("fill", "#00ff00");
+          rect.group.hoverCursor = "pointer";
+          rect.group.clickable = true;
+          canvas.renderAll();
+        });
+        canvasSites.invalid.forEach((site) => {
+          const rect = site.getObjects("rect")[0];
+          rect.set("fill", "#efefef");
+          rect.group.hoverCursor = "default";
+          rect.group.clickable = false;
+          canvas.renderAll();
+        });
+      },
+      {
+        // immediate: true,
+        deep: true,
+      }
+    );
+    if (this.admin) {
+      console.log("isAdmin");
     }
+
+    fabric.Canvas.prototype.getItemByName = function (name) {
+      var object = null,
+        objects = this.getObjects();
+
+      for (var i = 0, len = this.size(); i < len; i++) {
+        if (objects[i].name && objects[i].name === name) {
+          object = objects[i];
+          break;
+        }
+      }
+
+      return object;
+    };
+
+    this.addBlockSitesToCanvas(50, 70, 45, 0);
+    this.addBlockSitesToCanvas(305, 70, 45, 1);
+    this.addBlockSitesToCanvas(50, 490, 45, 2);
+    const canvas = this.$refs.canvas.canvas;
+    canvas.hoverCursor = "default";
+    const office = new fabric.Rect({
+      fill: "#ffffff",
+      stroke: "#000000",
+      strokeWidth: 1,
+      height: 80,
+      width: 90,
+      top: 320,
+      left: 740,
+      lockMovementX: true,
+      lockMovementY: true,
+      lockRotation: true,
+    });
+    office.setControlsVisibility({
+      bl: false,
+      br: false,
+      mb: false,
+      ml: false,
+      mr: false,
+      mt: false,
+      tl: false,
+      tr: false,
+      mtr: false,
+    });
+    canvas.add(office);
+    const grass = new fabric.Rect({
+      fill: "#118965",
+      height: 160,
+      width: 310,
+      top: 420,
+      left: 530,
+      lockMovementX: true,
+      lockMovementY: true,
+      lockRotation: true,
+    });
+    grass.setControlsVisibility({
+      bl: false,
+      br: false,
+      mb: false,
+      ml: false,
+      mr: false,
+      mt: false,
+      tl: false,
+      tr: false,
+      mtr: false,
+    });
+    canvas.add(grass);
+    const road = new fabric.Rect({
+      fill: "#000000",
+      height: 1000,
+      width: 70,
+    });
+    var lines = [];
+    for (let i = 0; i < 20; i++) {
+      lines = [
+        ...lines,
+        new fabric.Rect({
+          fill: "#e9e444",
+          height: 12,
+          width: 4,
+          top: (i + 1) * 30,
+          left: 35,
+          originX: "left",
+          originY: "top",
+        }),
+      ];
+    }
+    let roadGroup = new fabric.Group([road, ...lines], {
+      top: 0,
+      left: 890,
+      lockMovementX: true,
+      lockMovementY: true,
+      lockRotation: true,
+    });
+    roadGroup.setControlsVisibility({
+      bl: false,
+      br: false,
+      mb: false,
+      ml: false,
+      mr: false,
+      mt: false,
+      tl: false,
+      tr: false,
+      mtr: false,
+    });
+    canvas.add(roadGroup);
+
+    window.addEventListener("resize", this.onResize);
   },
   beforeDestroy() {
     window.removeEventListener("resize", this.onResize);
   },
   methods: {
+    dateRangeOverlaps(a_start, a_end, b_start, b_end) {
+      // a_start = a_start.getTime();
+      // a_end = a_end.getTime();
+      // b_start = b_start.getTime();
+      // b_end = b_end.getTime();
+      if (a_start <= b_start && b_start <= a_end) return true; // b starts in a
+      if (a_start <= b_end && b_end <= a_end) return true; // b ends in a
+      if (b_start < a_start && a_end < b_end) return true; // a in b
+      console.log(a_start, a_end, b_start, b_end);
+      return false;
+    },
+    getCanvasSites() {
+      const canvas = this.$refs.canvas.canvas;
+      const objects = canvas.getObjects("group");
+      const sites = objects.filter((object) => {
+        return object?.name;
+      });
+      if (!sites.length) {
+        sites = this.getCanvasSites();
+      }
+      const valid = sites.filter((canvasSite) => {
+        return this.validSites.some((site) => site.id == canvasSite.name);
+      });
+      const invalid = sites.filter((canvasSite) => {
+        return !this.validSites.some((site) => site.id == canvasSite.name);
+      });
+      return { valid, invalid };
+    },
     onResize() {
       this.windowWidth = window.innerWidth;
     },
-    onCanvasResize() {
-      console.log("resize");
-      this.resizeStage();
+    addBlockSitesToCanvas(top, left, gap, group) {
+      this.addSitesToCanvas(top, left, gap, group, "top");
+      this.addSitesToCanvas(top + 110, left, gap, group, "bottom");
     },
-    resizeStage() {
+    addSitesToCanvas(top, left, gap, group, position) {
+      const canvas = this.$refs.canvas.canvas;
+      let id = group * 14;
+      if (position == "bottom") {
+        id += 7;
+      }
+
+      for (let i = 0; i < 7; i++) {
+        const height = 90;
+        const width = 34;
+        const text = new fabric.Text((id + i + 1).toString(), {
+          fontSize: 22,
+          top: height / 2 - 10,
+          left: id + i + 2 <= 10 ? width / 2 - 5 : width / 2 - 11,
+          originX: "left",
+          originY: "top",
+        });
+        const obj = new fabric.Rect({
+          fill: "#e6e6e6",
+          stroke: "#000000",
+          strokeWidth: 1,
+          height: height,
+          width: width,
+        });
+        let group = new fabric.Group([obj, text], {
+          top: top,
+          left: (i + 1) * gap + left,
+          name: (id + i + 1).toString(),
+          lockMovementX: true,
+          lockMovementY: true,
+          lockRotation: true,
+          hoverCursor: "default",
+          clickable: false,
+        });
+        group.setControlsVisibility({
+          bl: false,
+          br: false,
+          mb: false,
+          ml: false,
+          mr: false,
+          mt: false,
+          tl: false,
+          tr: false,
+          mtr: false,
+        });
+        group.on("mousedown", (e) => {
+          if (e.target.clickable) {
+            const event = new CustomEvent("select-object", {
+              detail: e.target,
+            });
+            document.getElementById("canvas").dispatchEvent(event);
+          }
+        });
+        canvas.add(group);
+      }
+    },
+    onContainerResize() {
+      this.resizeCanvas();
+    },
+    resizeCanvas() {
       const container = this.$refs.container;
+      const canvas = this.$refs.canvas.canvas;
       if (!container) {
         return;
       }
-      const width = container.offsetWidth;
-      const scale = width / this.configKonva.width;
 
-      this.configKonva.width = this.configKonva.width * scale;
-      this.configKonva.height = this.configKonva.height * scale;
-      this.configKonva.scale = { x: scale, y: scale };
+      const width = container.clientWidth;
+      const height = container.clientHeight;
+      console.log("width: ", canvas.getWidth());
+      const scale = width / canvas.getWidth();
+      const zoom = canvas.getZoom() * scale;
+      canvas.setDimensions({
+        width,
+        height,
+      });
+
+      canvas.setViewportTransform([zoom, 0, 0, zoom, 0, 0]);
+      console.log("resize");
+      canvas.renderAll();
+    },
+    handleCanvasClick(e) {
+      this.form.site = e.detail.name;
     },
     validateState(name) {
       let objArr = name.split(".");
@@ -306,7 +502,7 @@ export default {
   padding-top: 56.25%;
   position: relative;
 }
-.stage {
+.fabric-container {
   position: absolute;
   top: 0;
   left: 0;

@@ -105,7 +105,8 @@ export default {
   plugins: [
     { src: "~/plugins/google-maps", ssr: false },
     { src: "~/plugins/v-calendar.js", ssr: false },
-    { src: "~/plugins/vue-konva.js", ssr: false },
+    { src: "~/plugins/vue-fabric.js", ssr: false },
+    // { src: "~/plugins/vue-konva.js", ssr: false },
   ],
 
   router: {
