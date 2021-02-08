@@ -63,8 +63,13 @@ export default {
     commit("SET_AUTH_USER", authUserObj);
   },
   async setReservationDetails({ commit }, details) {
-    console.log(details);
     commit("SET_RESERVATION_DETAILS", details);
+  },
+  async removeReservationNav({ commit }) {
+    commit("REMOVE_RESERVATION_NAV");
+  },
+  async setBookingDetails({ commit }, details) {
+    commit("SET_BOOKING_DETAILS", details);
   },
   async getSites({ commit, state }) {
     try {

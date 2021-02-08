@@ -2,7 +2,7 @@
   <div>
     <b-container>
       <b-card no-body>
-        <b-tabs card fill content-class="mt-3">
+        <b-tabs card pills fill content-class="mt-3">
           <b-tab title="Sign In" active>
             <b-form class="p-3" @submit.stop.prevent="signInUser">
               <b-form-invalid-feedback
@@ -15,6 +15,7 @@
                   id="sign-in-Email"
                   type="text"
                   data-form="sign-in"
+                  required
                   v-model="signIn.email"
                 ></b-form-input>
               </b-form-group>
@@ -24,11 +25,12 @@
                   type="password"
                   data-form="sign-in"
                   v-model="signIn.password"
+                  required
                 ></b-form-input>
               </b-form-group>
               <b-button type="submit" variant="primary"> Sign In </b-button>
               <b-form-text
-                class="ml-3"
+                class="mt-2"
                 tag="a"
                 style="cursor: pointer"
                 v-b-modal.password-reset-modal
@@ -127,6 +129,7 @@
 import { validationMixin } from "vuelidate";
 import { required, minLength, sameAs, email } from "vuelidate/lib/validators";
 import { mapState } from "vuex";
+import resetPasswordHelper from "../util/password-reset";
 
 export default {
   name: "auth",
@@ -149,6 +152,7 @@ export default {
         email: "",
         error: false,
       },
+      success: false,
     };
   },
   validations: {
@@ -174,6 +178,11 @@ export default {
     ...mapState({
       reservationDetails: (state) => state.reservationDetails,
     }),
+  },
+  beforeDestroy() {
+    if (this.reservationDetails?.redirectPayment && !this.success) {
+      this.$store.dispatch("removeReservationNav");
+    }
   },
   methods: {
     validateState(name) {
@@ -213,13 +222,14 @@ export default {
           uid: user.uid,
         };
         await this.$store.dispatch("setAuth", authUser);
+        this.success = true;
         this.redirect(user);
       } catch (e) {
         alert(e);
       }
     },
     async redirect(user) {
-      if (this.reservationDetails && this.reservationDetails.redirectPayment) {
+      if (this.reservationDetails && this.reservationDetails?.redirectPayment) {
         this.$router.push("/payment");
       } else if (user.email == "admin@admin.com") {
         this.$router.push("/admin");
@@ -227,12 +237,17 @@ export default {
         this.$router.push("/dashboard");
       }
     },
-    async resetPassword(email = null) {
+    async resetPassword() {
       try {
-        await this.$fire.auth.sendPasswordResetEmail(
-          email ? email : this.passwordReset.email
+        const response = await resetPasswordHelper(
+          this.passwordReset.email,
+          this.$fire
         );
-        this.showSuccess = true;
+        if (response.success) {
+          this.showSuccess = true;
+        } else {
+          this.passwordReset.error = "Error";
+        }
       } catch (err) {
         this.passwordReset.error = err.message;
       }
@@ -245,6 +260,7 @@ export default {
 .nav-tabs {
   .nav-link {
     background-color: lighten($secondary, 10%);
+    color: $white;
     &.active {
       background-color: darken($primary, 10%);
       color: $white;

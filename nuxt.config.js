@@ -13,6 +13,9 @@ export default {
         ? process.env.FIREBASE_FUNCTIONS_DEV
         : process.env.FIREBASE_FUNCTIONS_PROD,
     firestoreURL: process.env.FIRESTORE,
+    monthlyRate: process.env.MONTHLY_RATE,
+    weeklyRate: process.env.WEEKLY_RATE,
+    recaptcha: process.env.RECAPTCHA_SITE_KEY,
   },
 
   // Global page headers (https://go.nuxtjs.dev/config-head)
@@ -126,10 +129,21 @@ export default {
     "@nuxtjs/axios",
     "bootstrap-vue/nuxt",
     "@nuxtjs/dayjs",
+    "@nuxtjs/recaptcha",
   ],
   bootstrapVue: {
     bootstrapCSS: false,
     bootstrapVueCSS: false,
+  },
+  dayjs: {
+    weekStart: 1,
+  },
+  recaptcha: {
+    siteKey: process.env.RECAPTCHA_SITE_KEY,
+    hideBadge: false,
+    language: "en",
+    version: 2,
+    size: "normal",
   },
 
   firebase: {
@@ -169,7 +183,13 @@ export default {
 
   fontawesome: {
     icons: {
-      solid: ["faMapMarkerAlt", "faPhoneSquare", "faEnvelope"],
+      solid: [
+        "faMapMarkerAlt",
+        "faPhoneSquare",
+        "faEnvelope",
+        "faCalendarAlt",
+        "faTable",
+      ],
       brands: ["faGithub", "faInstagram"],
     },
   },

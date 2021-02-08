@@ -6,6 +6,7 @@
 
 <script>
 import { mapState } from "vuex";
+import { paypalWeekly, paypalMonthly } from "../util/paypal-helper";
 
 export default {
   name: "PayPal",
@@ -22,7 +23,7 @@ export default {
     },
   },
   computed: {
-    ...mapState(["authUser", "reservationDetails"]),
+    ...mapState(["authUser", "reservationDetails", "bookingDetails"]),
   },
   mounted: function () {
     const script = document.createElement("script");
@@ -32,72 +33,79 @@ export default {
     document.body.appendChild(script);
   },
   methods: {
-    setLoaded: function () {
+    setLoaded: async function () {
+      this.$emit("loaded");
       if (this.reservationDetails.submitState == "Submitted") {
-        const monthlyRate = 100.0;
-        const startDate = this.$dayjs(this.reservationDetails.startDate);
-        const startNextMonth = startDate.add(1, "month").date(1);
-        console.log(startDate, startNextMonth);
-        const numDaysUntilNextMonth = startNextMonth.diff(startDate, "day");
-        const daysInMonth = startDate.daysInMonth();
-        let proratedCharge =
-          (numDaysUntilNextMonth / daysInMonth) * monthlyRate;
-        proratedCharge = proratedCharge.toFixed(2);
-        console.log(proratedCharge);
-        console.log(numDaysUntilNextMonth);
+        const token = await this.$fire.auth.currentUser.getIdToken(true);
+        const response = await this.$axios.get(
+          `${this.$config.functionsURL}/webApi/check-auth`,
+          {
+            headers: {
+              "Authorization": token,
+            },
+          }
+        );
+        const { success } = response.data;
+        if (!success) {
+          this.$router.push("/sites");
+        }
+
+        const { monthlyRate, weeklyRate } = this.$config;
+        const {
+          proratedCharge,
+          numDaysNextInterval,
+          interval,
+          numIntervals,
+          immediate,
+          paymentStart,
+        } = this.bookingDetails;
+        let { startDate, endDate } = this.bookingDetails;
+
+        startDate = setEndOfDay(startDate);
+        endDate = setEndOfDay(endDate);
+
+        function setEndOfDay(day) {
+          return day.hour(23).minute(59).second(59).millisecond(999);
+        }
+
         this.loaded = true;
+
+        const config = {
+          reservationDetails: this.reservationDetails,
+          startDate,
+          endDate,
+          paymentStart,
+          proratedCharge: proratedCharge,
+          immediate,
+        };
+
+        const monthlyConfig = {
+          ...config,
+          numDaysUntilNextMonth: numDaysNextInterval,
+          monthlyRate,
+        };
+
+        const weeklyConfig = {
+          ...config,
+          numDaysUntilNextWeek: numDaysNextInterval,
+          weeklyRate,
+        };
         window.paypal
           .Buttons({
             createSubscription: (data, actions) => {
-              return actions.subscription.create({
-                "plan_id": "P-0K585564PM541093LMAHLK5Q",
-                "custom_id": this.reservationDetails.site,
-                "start_time": startDate.toISOString(),
-                "plan": {
-                  "product_id": "rv-spot",
-                  "name": "RV Reservation",
-                  "description": "RV Reservation",
-                  "billing_cycles": [
-                    {
-                      "pricing_scheme": {
-                        "version": 1,
-                        "fixed_price": {
-                          "currency_code": "USD",
-                          "value": proratedCharge,
-                        },
-                      },
-                      "frequency": {
-                        "interval_unit": "DAY",
-                        "interval_count": numDaysUntilNextMonth,
-                      },
-                      "tenure_type": "TRIAL",
-                      "sequence": 1,
-                      "total_cycles": 1,
-                    },
-                    {
-                      "pricing_scheme": {
-                        "version": 1,
-                        "fixed_price": {
-                          "currency_code": "USD",
-                          "value": monthlyRate.toString(),
-                        },
-                      },
-                      "frequency": {
-                        "interval_unit": "MONTH",
-                        "interval_count": 1,
-                      },
-                      "tenure_type": "REGULAR",
-                      "sequence": 2,
-                      "total_cycles": this.reservationDetails.numMonths.toString(),
-                    },
-                  ],
-                },
-              });
+              if (interval == "monthly") {
+                return actions.subscription.create(
+                  paypalMonthly(monthlyConfig)
+                );
+              } else if (interval == "weekly") {
+                return actions.subscription.create(paypalWeekly(weeklyConfig));
+              } else {
+                return null;
+              }
             },
             onApprove: async (data, actions) => {
+              console.log(data, actions);
               const db = this.$fire.firestore;
-              const FieldValue = this.$fireModule.firestore.FieldValue;
-
               const authUser = this.$fire.auth.currentUser;
 
               const fbUser = await db
@@ -107,6 +115,7 @@ export default {
                 .then((documentSnapshot) => {
                   return documentSnapshot.data();
                 });
+
               const user = { ...fbUser, uid: authUser.uid };
               console.log("user", user);
               try {
@@ -122,48 +131,30 @@ export default {
                     },
                     id: data.subscriptionID,
                     status: "Initiated",
+                    site: this.reservationDetails.site,
                   });
               } catch (e) {
                 console.log("add subscription error", e);
               }
-
-              const startDate = this.$dayjs(this.reservationDetails.startDate);
-              const endDate = startDate.add(
-                this.reservationDetails.numMonths,
-                "month"
-              );
 
               const bookDates = {
                 start: startDate.toISOString(),
                 end: endDate.toISOString(),
                 paypalSubscriptionID: data.subscriptionID,
               };
-              try {
-                db.collection("sites")
-                  .doc(this.reservationDetails.site)
-                  .update("booked", FieldValue.arrayUnion(bookDates));
 
-                db.collection("sites")
-                  .doc(this.reservationDetails.site)
-                  .collection("bookings")
-                  .doc()
-                  .set({
-                    paypalSubscriptionID: data.subscriptionID,
-                    startDate: this.reservationDetails.startDate,
-                    numMonths: this.reservationDetails.numMonths,
-                    status: "Initiated",
-                    admin: {
-                      uid: user.uid,
-                      userEmail: user.email,
-                      userName: user.name,
-                    },
-                  });
-              } catch (e) {
-                console.log("Site/booking add error", e);
-              }
-
+              const successData = {
+                site: this.reservationDetails.site,
+                startDate: startDate.toISOString(),
+                endDate: endDate.toISOString(),
+                interval,
+                numIntervals,
+                user: user,
+                bookDates: bookDates,
+                subscriptionID: data.subscriptionID,
+              };
               this.paidFor = true;
-              this.$emit("success", data);
+              this.$emit("success", successData);
             },
             onError: (err) => {
               console.log(err);

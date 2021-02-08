@@ -19,6 +19,13 @@
             assumenda omnis, ut aperiam. Ad quo sequi debitis odio recusandae
             voluptate nesciunt?
           </span>
+          <h4 class="my-3">Amenities</h4>
+          <span
+            >Lorem ipsum dolor sit amet consectetur adipisicing elit. Nesciunt
+            earum consequatur, eveniet illum totam alias, cupiditate
+            reprehenderit reiciendis illo optio, adipisci commodi natus
+            voluptatum! Cupiditate corrupti magnam eveniet molestiae fuga!</span
+          >
         </b-card>
       </div>
     </section>

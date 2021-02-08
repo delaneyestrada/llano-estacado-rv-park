@@ -24,7 +24,7 @@
             <font-awesome-icon :icon="['fas', 'envelope']" />
           </div>
         </nuxt-link>
-        <span class="hide-small">dillon.estrada55@gmail.com</span>
+        <span class="hide-small">llanoestacadorvpark@gmail.com</span>
       </div>
     </div>
     <client-only>
@@ -326,6 +326,27 @@ html {
 body {
   font-family: $montserrat;
 }
+:root {
+  @media screen and (min-width: 1140px) {
+    font-size: 16px;
+  }
+  @media screen and (min-width: 960px) and (max-width: 1140px) {
+    font-size: 15px;
+  }
+  @media screen and (min-width: 750px) and (max-width: 960px) {
+    font-size: 14px;
+  }
+  @media screen and (min-width: 500px) and (max-width: 720px) {
+    font-size: 13px;
+  }
+  @media screen and (max-width: 500px) {
+    font-size: 12px;
+  }
+  // sm: 400px,
+  // md: 720px,
+  // lg: 960px,
+  // xl: 1140px,
+}
 
 .info-bar {
   display: grid;
@@ -352,6 +373,13 @@ body {
 @media screen and (max-width: 625px) {
   .hide-small {
     display: none;
+  }
+}
+@media screen and (max-width: 959px) {
+  .navbar-nav {
+    .nav-item {
+      margin-left: auto;
+    }
   }
 }
 a {

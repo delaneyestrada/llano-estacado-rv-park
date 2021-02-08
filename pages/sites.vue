@@ -1,7 +1,19 @@
 <template>
   <div>
     <b-container>
-      <h2 class="header mt-5 mb-2">Book Your Site</h2>
+      <div class="booking-info-sites">
+        <strong>Important</strong>
+        <ul>
+          <li>
+            Your first payment period will be paid upfront to confirm your
+            booking.
+          </li>
+          <li>
+            Monthly bookings are prorated to the beginning of the next month.
+          </li>
+        </ul>
+      </div>
+      <h2 class="header mb-2">Book Your Site</h2>
       <section id="site-picker">
         <SiteMap />
       </section>
@@ -13,11 +25,16 @@
 export default {
   name: "Sites",
 
-  data() {
-    return {};
+  mounted() {
+    this.$store.dispatch("getSites");
   },
 };
 </script>
 
 <style lang="scss">
+.booking-info-sites {
+  margin: 2rem 0 0.5rem 0;
+  background-color: lighten($light, 10%);
+  padding: 1rem;
+}
 </style>

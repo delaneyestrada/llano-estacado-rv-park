@@ -3,7 +3,7 @@
     <div class="header">
       <div class="main">
         <h1>Lubbock's Premium RV Park</h1>
-        <h2>(Tagline)</h2>
+        <h2>Weekly and Monthly Rentals</h2>
         <b-button variant="primary">Book A Site</b-button>
       </div>
       <img src="@/static/rv-driving-llano.jpg" alt="" />
@@ -34,20 +34,18 @@
           <b-carousel-slide img-src="@/static/side-rv-parked.jpg">
           </b-carousel-slide>
         </b-carousel>
-        <div class="content p-3">
-          <h3>Info</h3>
-          <p>
-            Lorem ipsum dolor sit amet, consectetur adipisicing elit. Minus qui
-            quaerat eveniet! Corporis eos reiciendis corrupti optio fugit quasi
-            necessitatibus maiores est vitae voluptates officiis commodi
-            excepturi tenetur, libero autem.Doloribus aspernatur quae
-            consequatur asperiores quibusdam, pariatur rerum vero est sed
-            laboriosam accusamus! Nihil vero fugit esse, dignissimos
-            exercitationem in, explicabo molestiae soluta tempora minus vitae
-            asperiores voluptate, porro error.
-          </p>
+        <div
+          class="content d-flex justify-content-center align-items-center p-3"
+        >
+          <div>
+            <p>
+              Llano Estacado RV Park is the place to park your RV in Lubbock,
+              TX. Conveniently located near major highways, oversized spots, and
+              locally owned.
+            </p>
 
-          <b-button variant="primary" to="/about">About Us</b-button>
+            <b-button variant="primary" to="/about">About Us</b-button>
+          </div>
         </div>
       </b-card>
     </main>
@@ -65,6 +63,11 @@ export default {
 
 <style lang="scss">
 #home {
+  .content {
+    p {
+      font-size: 1.2rem;
+    }
+  }
   .header {
     width: 100%;
     height: 45vh;

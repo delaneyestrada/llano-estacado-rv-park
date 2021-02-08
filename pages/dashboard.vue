@@ -19,7 +19,7 @@
               >
               <b-tab title="Password"
                 ><b-card-text
-                  ><b-button variant="secondary" @click="resetPassword"
+                  ><b-button variant="primary" @click="resetPassword"
                     >Send Password Reset Email</b-button
                   ></b-card-text
                 ></b-tab
@@ -44,6 +44,7 @@
 <script>
 import { mapState } from "vuex";
 import BillingTable from "@/components/BillingTable";
+import resetPasswordHelper from "../util/password-reset";
 
 export default {
   name: "dashboard",
@@ -72,9 +73,16 @@ export default {
       });
   },
   methods: {
-    resetPassword() {
-      this.$emit("reset-password", this.authUser.email);
-      this.showAlert = this.dismissSeconds;
+    async resetPassword() {
+      const response = await resetPasswordHelper(
+        this.authUser.email,
+        this.$fire
+      );
+      if (response.success) {
+        this.showAlert = this.dismissSeconds;
+      } else {
+        alert("Something went wrong");
+      }
     },
   },
   // methods: {

@@ -7,6 +7,10 @@ export default function ({ store, redirect, route }) {
   isAdminRoute(route)
     ? redirect("/")
     : "";
+  store.state.bookingDetails == undefined && isPaymentRoute(route)
+    ? redirect("/sites")
+    : "";
+  store.state.authUser != null && isLoginRoute(route) ? redirect("/") : "";
 }
 
 function isAuthRoute(route) {
@@ -16,6 +20,16 @@ function isAuthRoute(route) {
 }
 function isAdminRoute(route) {
   if (route.matched.some((record) => record.path == "/admin")) {
+    return true;
+  }
+}
+function isLoginRoute(route) {
+  if (route.matched.some((record) => record.path == "/login")) {
+    return true;
+  }
+}
+function isPaymentRoute(route) {
+  if (route.matched.some((record) => record.path == "/payment")) {
     return true;
   }
 }

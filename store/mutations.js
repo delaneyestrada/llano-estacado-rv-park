@@ -30,6 +30,17 @@ export default {
   SET_RESERVATION_DETAILS: (state, details) => {
     state.reservationDetails = details;
   },
+  SET_BOOKING_DETAILS: (state, details) => {
+    state.bookingDetails = details;
+  },
+  REMOVE_RESERVATION_NAV: (state) => {
+    if (state.reservationDetails) {
+      const newReservationDetails = Object.assign(state.reservationDetails, {
+        redirectPayment: false,
+      });
+      state.reservationDetails = newReservationDetails;
+    }
+  },
   SET_SITES: (state, sites) => {
     state.sites = sites;
   },

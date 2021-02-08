@@ -12,6 +12,7 @@
       stacked="md"
       show-empty
       small
+      striped
     >
       <template #cell(actions)="row" v-if="authUser.isAdmin">
         <b-button size="sm" :href="filterLinks(row.item.links, 'self').href">
