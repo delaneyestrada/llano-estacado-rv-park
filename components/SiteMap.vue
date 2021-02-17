@@ -218,8 +218,10 @@ export default {
           ).toFixed(2);
           const numIntervals = this.reservationDetails.numMonths - 1;
           const endDate = startNextMonth
-            .add(numIntervals, "month")
+            .add(numIntervals + 1, "month")
             .subtract(1, "day");
+          console.log("end date: ", startNextMonth, numIntervals, endDate);
+
           const paymentStart = startDate.add(1, "month");
           return {
             interval: "monthly",
@@ -251,7 +253,7 @@ export default {
             numDaysUntilNextWeek = startNextWeek.diff(startDate, "day");
           }
           const endDate = startNextWeek
-            .add(numIntervals, "week")
+            .add(numIntervals + 1, "week")
             .subtract(1, "day");
           const proratedCharge = (
             (numDaysUntilNextWeek / 7) *
@@ -413,7 +415,6 @@ export default {
       if (a_start <= b_start && b_start <= a_end) return true; // b starts in a
       if (a_start <= b_end && b_end <= a_end) return true; // b ends in a
       if (b_start < a_start && a_end < b_end) return true; // a in b
-      console.log(a_start, a_end, b_start, b_end);
       return false;
     },
     renderSelected(newSite) {
@@ -570,7 +571,6 @@ export default {
         }
 
         formStartDate = formStartDate.toDate();
-        console.log(formStartDate, formEndDate);
         let overlappingBookings = [];
         if (bookings) {
           overlappingBookings = bookings.filter((booking) => {
@@ -582,7 +582,6 @@ export default {
               bookingStartDate,
               bookingEndDate
             );
-            console.log(bookingStartDate, bookingEndDate, overlap);
             if (overlap) {
               return true;
             }

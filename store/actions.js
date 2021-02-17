@@ -2,7 +2,6 @@ export default {
   async nuxtServerInit({ dispatch }, ctx) {
     // INFO -> Nuxt-fire Objects can be accessed in nuxtServerInit action via this.$fire___, ctx.$fire___ and ctx.app.$fire___'
     /** Get the VERIFIED authUser on the server */
-    console.log(ctx);
     if (ctx.res && ctx.res.locals && ctx.res.locals.user) {
       const { allClaims: claims, ...authUser } = ctx.res.locals.user;
 
@@ -73,23 +72,19 @@ export default {
   },
   async getSites({ commit, state }) {
     try {
-      if (state.authUser && state.authUser.isAdmin) {
-      } else {
-        this.$fire.firestore
-          .collection("sites")
-          .onSnapshot(function (snapshot) {
-            snapshot.docs.forEach((doc) => {
-              console.log(doc);
-            });
-          });
-      }
+      // if (state.authUser && state.authUser.isAdmin) {
+      // } else {
+      //   this.$fire.firestore
+      //     .collection("sites")
+      //     .onSnapshot(function (snapshot) {
+      //       snapshot.docs.forEach((doc) => {
+      //         console.log(doc);
+      //       });
+      //     });
+      // }
       const response = await this.$axios.get(
         `${this.$config.functionsURL}/webApi/sites`
       );
-
-      // const response = await this.$axios.get(
-      //   "http://localhost:5001/llano-estacado-rv-park/us-central1/webApi/sites"
-      // );
       commit("SET_SITES", response.data);
     } catch (e) {
       console.error(e);

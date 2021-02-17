@@ -1,6 +1,6 @@
 <template>
   <div>
-    <b-container>
+    <b-container class="mt-5">
       <div class="booking-info-sites">
         <strong>Important</strong>
         <ul>

@@ -85,7 +85,7 @@
           </b-form-group>
         </b-col>
 
-        <b-col lg="6" class="my-1">
+        <!-- <b-col lg="6" class="my-1">
           <b-form-group
             v-model="sortDirection"
             label="Filter On"
@@ -101,13 +101,12 @@
               :aria-describedby="ariaDescribedby"
               class="mt-1"
             >
-              <!-- <b-form-checkbox value="admin.userName">Name</b-form-checkbox> -->
               <b-form-checkbox value="site">Site</b-form-checkbox>
               <b-form-checkbox value="startDate">Start Date</b-form-checkbox>
               <b-form-checkbox value="endDate">End Date</b-form-checkbox>
             </b-form-checkbox-group>
           </b-form-group>
-        </b-col>
+        </b-col> -->
         <b-col lg="6" class="my-1">
           <b-form-group
             label="Show"
@@ -117,11 +116,7 @@
             label-size="sm"
             class="mb-0"
           >
-            <b-form-select
-              v-model="showOption"
-              :aria-describedby="ariaDescribedby"
-              size="sm"
-            >
+            <b-form-select v-model="showOption" size="sm">
               <option :value="'end'">End Date after today</option>
               <option :value="'all'">All</option>
               <option :value="'start'">Start Date after today</option>
@@ -157,51 +152,27 @@
         small
         striped
         @filtered="onFiltered"
+        ref="table"
       >
         <template #cell(name)="row">
           {{ row.value.first }} {{ row.value.last }}
         </template>
 
         <template #cell(actions)="row">
-          <b-button
-            size="sm"
-            @click="info(row.item, row.index, $event.target)"
-            class="mr-1"
-          >
-            Info modal
-          </b-button>
-          <b-button size="sm" @click="row.toggleDetails">
-            {{ row.detailsShowing ? "Hide" : "Show" }} Details
-          </b-button>
-        </template>
-
-        <template #row-details="row">
-          <b-card no-body>
-            <BookingInfo
-              :bookingData="row.item"
-              :site="1"
-              :table="true"
-              @cancel="handleCancel"
-            />
-          </b-card>
+          <CancelModal
+            :subscriptionID="row.item.paypalSubscriptionID"
+            :site="row.item.site"
+            :manual="row.item.status == 'Manual' ? true : false"
+            @cancel="handleCancel"
+          />
         </template>
       </b-table>
-
-      <!-- Info modal -->
-      <b-modal
-        :id="infoModal.id"
-        :title="infoModal.title"
-        ok-only
-        @hide="resetInfoModal"
-      >
-        <pre>{{ infoModal.content }}</pre>
-      </b-modal>
     </b-container>
   </div>
 </template>
 
 <script>
-import BookingInfo from "@/components/BookingInfo";
+import CancelModal from "@/components/CancelModal";
 export default {
   name: "BookingsTable",
   data() {
@@ -229,6 +200,11 @@ export default {
           sortable: true,
         },
         {
+          key: "status",
+          label: "Status",
+          sortable: true,
+        },
+        {
           key: "paypalSubscriptionID",
           label: "ID",
           sortable: true,
@@ -250,23 +226,51 @@ export default {
         title: "",
         content: "",
       },
+      tableBookings: null,
+      unwatch: null,
     };
   },
   props: ["bookings"],
-  components: { BookingInfo },
+  components: { CancelModal },
   computed: {
-    tableBookings() {
+    sortOptions() {
+      // Create an options list from our fields
+      return this.fields
+        .filter((f) => f.sortable)
+        .map((f) => {
+          return { text: f.label, value: f.key };
+        });
+    },
+  },
+  mounted() {
+    // Set the initial number of items
+    this.totalRows = this.bookings.length;
+    this.unwatch = this.$watch(
+      (vm) => [vm.showOption, vm.bookings],
+      (val) => {
+        this.watchFunction();
+      },
+      {
+        immediate: true,
+      }
+    );
+  },
+  beforeDestroy() {
+    this.unwatch();
+  },
+  methods: {
+    watchFunction() {
       if (this.bookings) {
         let bookings = this.bookings.filter((booking) => {
           const endDate = this.$dayjs(booking.endDate);
           const startDate = this.$dayjs(booking.startDate);
           const today = this.$dayjs();
 
-          if ((this.showOption = "end")) {
+          if (this.showOption == "end") {
             return (
               today.isBefore(endDate, "day") || today.isSame(endDate, "day")
             );
-          } else if ((this.showOption = "start")) {
+          } else if (this.showOption == "start") {
             return (
               today.isBefore(startDate, "day") || today.isSame(startDate, "day")
             );
@@ -280,32 +284,15 @@ export default {
           startDate = this.$dayjs(startDate).format("MM-DD-YYYY");
           return Object.assign(booking, { endDate, startDate });
         });
-        return bookings;
+        this.tableBookings = bookings;
+        this.$refs.table.refresh();
       } else {
-        return null;
+        this.tableBookings = null;
       }
     },
-    sortOptions() {
-      // Create an options list from our fields
-      return this.fields
-        .filter((f) => f.sortable)
-        .map((f) => {
-          return { text: f.label, value: f.key };
-        });
-    },
-  },
-  mounted() {
-    // Set the initial number of items
-    this.totalRows = this.bookings.length;
-  },
-  methods: {
     handleCancel(data) {
       this.$emit("cancel", data);
-    },
-    info(item, index, button) {
-      this.infoModal.title = `Row index: ${index}`;
-      this.infoModal.content = JSON.stringify(item, null, 2);
-      this.$root.$emit("bv::show::modal", this.infoModal.id, button);
+      this.$refs.table.refresh();
     },
     resetInfoModal() {
       this.infoModal.title = "";

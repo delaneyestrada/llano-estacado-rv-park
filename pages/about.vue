@@ -51,6 +51,7 @@ export default {
 #about {
   .card {
     width: 100%;
+    border-radius: 0;
   }
 }
 </style>

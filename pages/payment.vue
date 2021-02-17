@@ -133,7 +133,7 @@ export default {
       const FieldValue = this.$fireModule.firestore.FieldValue;
 
       const data = e;
-
+      console.log(data);
       db.collection("sites")
         .doc(data.site.toString())
         .update("booked", FieldValue.arrayUnion(data.bookDates));
@@ -161,6 +161,7 @@ export default {
       this.$router.push({ name: "success", params: e });
     },
     sendConfirmationEmail(data) {
+      console.log(data);
       return this.$axios
         .post(`${this.$config.functionsURL}/webApi/confirmation-email`, {
           data: data,

@@ -137,6 +137,9 @@ export default {
   },
   dayjs: {
     weekStart: 1,
+    defaultLocale: "en",
+    defaultTimeZone: "America/Chicago",
+    plugins: ["utc", "timezone"],
   },
   recaptcha: {
     siteKey: process.env.RECAPTCHA_SITE_KEY,
@@ -148,7 +151,7 @@ export default {
 
   firebase: {
     config: {
-      apiKey: "***REMOVED***",
+      apiKey: process.env.FIREBASE_API_KEY,
       authDomain: "llano-estacado-rv-park.firebaseapp.com",
       projectId: "llano-estacado-rv-park",
       storageBucket: "llano-estacado-rv-park.appspot.com",

@@ -65,9 +65,9 @@ export default {
         endDate = setEndOfDay(endDate);
 
         function setEndOfDay(day) {
-          return day.hour(23).minute(59).second(59).millisecond(999);
+          const dayUtc = day.utc(true).utcOffset(0);
+          return dayUtc.hour(23).minute(59).second(59).millisecond(999);
         }
-
         this.loaded = true;
 
         const config = {
@@ -104,7 +104,6 @@ export default {
               }
             },
             onApprove: async (data, actions) => {
-              console.log(data, actions);
               const db = this.$fire.firestore;
               const authUser = this.$fire.auth.currentUser;
 
@@ -117,7 +116,6 @@ export default {
                 });
 
               const user = { ...fbUser, uid: authUser.uid };
-              console.log("user", user);
               try {
                 db.collection("users")
                   .doc(user.uid)

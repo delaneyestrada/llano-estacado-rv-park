@@ -4,7 +4,7 @@
       <div class="main">
         <h1>Lubbock's Premium RV Park</h1>
         <h2>Weekly and Monthly Rentals</h2>
-        <b-button variant="primary">Book A Site</b-button>
+        <b-button variant="primary" to="/sites">Book A Site</b-button>
       </div>
       <img src="@/static/rv-driving-llano.jpg" alt="" />
     </div>
@@ -81,7 +81,7 @@ export default {
       left: 0;
       width: 100%;
       height: 100%;
-      background-color: rgba(#030512, 0.5);
+      background-color: rgba(#030512, 0.65);
     }
     .main {
       position: absolute;
@@ -93,9 +93,11 @@ export default {
       text-align: center;
       height: 50%;
       color: $white;
-      h1,
+      h1 {
+        font-weight: 900;
+      }
       h2 {
-        font-weight: 800;
+        font-weight: 400;
       }
       .btn {
         font-weight: 600;

@@ -33,47 +33,25 @@
           </li>
         </ul>
       </div>
-      <b-button
-        type="button"
-        variant="danger"
-        v-b-modal="`booking-modal${bData.user.subscriptionID}`"
-      >
-        Cancel
-      </b-button>
+      <CancelModal
+        :subscriptionID="bData.user.subscriptionID"
+        :site="bData.site"
+        :manual="bData.manual"
+        @cancel="handleCancel"
+      />
     </div>
-    <b-modal
-      :id="`booking-modal${bData.user.subscriptionID}`"
-      hide-header
-      ok-title="Cancel booking"
-      ok-variant="danger"
-      cancel-title="Back"
-      cancel-variant="primary"
-      v-on:ok="handleSubmit"
-      v-if="bData"
-    >
-      <p v-if="!bData.manual">
-        Cancelling the booking will not cancel their PayPal payments. Use
-        subscription ID
-        <strong>{{ bData.user.subscriptionID }}</strong> to find the
-        subscription on the PayPal dashboard to cancel it.
-      </p>
-      <p v-else>
-        This booking was done manually. Make sure to handle payment on your end
-        as well.
-        <span class="d-block"
-          >Subscription ID:
-          <strong>{{ bData.user.subscriptionID }}</strong></span
-        >
-      </p>
-      <strong>This can not be undone.</strong>
-    </b-modal>
   </div>
 </template>
 
 <script>
+import CancelModal from "@/components/CancelModal";
+
 export default {
   name: "BookingInfo",
   props: ["bookingData", "site", "table"],
+  components: {
+    CancelModal,
+  },
   computed: {
     bData() {
       if (this.table) {
@@ -108,16 +86,11 @@ export default {
     },
   },
   methods: {
-    handleSubmit() {
-      const cancelData = {
-        subscriptionID: this.bData.user.subscriptionID,
-        site: this.bData.site,
-        manual: this.bData.manual ? true : false,
-      };
-      this.$emit("cancel", cancelData);
-    },
     formatDate(date) {
       return this.$dayjs(date).format("MM-DD-YYYY");
+    },
+    handleCancel(data) {
+      this.$emit("cancel", data);
     },
   },
 };
