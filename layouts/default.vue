@@ -59,7 +59,7 @@
             <b-nav-item-dropdown
               v-if="isLoggedIn"
               right
-              no-caret
+              toggle-class="user-toggle"
               class="user-dropdown"
               menu-class="user-dropdown"
             >
@@ -392,5 +392,8 @@ a {
 .form-group {
   padding-bottom: 1rem;
   width: 100%;
+}
+.user-toggle {
+  text-align: right;
 }
 </style>

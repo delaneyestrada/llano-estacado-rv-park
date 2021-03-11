@@ -192,6 +192,7 @@ export default {
         "faEnvelope",
         "faCalendarAlt",
         "faTable",
+        "faExclamationCircle",
       ],
       brands: ["faGithub", "faInstagram"],
     },

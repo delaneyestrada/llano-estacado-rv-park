@@ -18,7 +18,22 @@ admin.initializeApp({
 //initialize express server
 const app = express();
 
-app.use(cors({ origin: true }));
+// const whitelist = ["dev.local", "https://www.llanoestacadorvpark.com"];
+// const corsOptionsDelegate = function (req, callback) {
+//   let corsOptions;
+//   if (whitelist.indexOf(req.header("Origin")) !== -1) {
+//     corsOptions = { origin: true }; // reflect (enable) the requested origin in the CORS response
+//   } else {
+//     corsOptions = { origin: false }; // disable CORS for this request
+//   }
+//   callback(null, corsOptions); // callback expects two parameters: error and options
+// };
+
+// app.use(cors({ origin: "http://dev.local:8088" }));
+app.options("*", cors());
+
+const corsFromSite = { origin: "http://dev.local:8088" };
+const corsFromPaypal = { origin: "https://www.paypal.com/ipn" };
 
 const db = admin.firestore();
 const {
@@ -58,7 +73,7 @@ let environment = new paypal.core.SandboxEnvironment(
   paypalClientSecret
 );
 let client = new paypal.core.PayPalHttpClient(environment);
-app.post("/paypal-ipn", async (req, res) => {
+app.post("/paypal-ipn", cors(corsFromPaypal), async (req, res) => {
   if (req.method !== "POST") {
     console.error("Request method not allowed.");
     res.status(405).send("Method Not Allowed");
@@ -125,7 +140,7 @@ app.post("/paypal-ipn", async (req, res) => {
       }
     });
 });
-app.post("/paypal", async (request, response) => {
+app.post("/paypal", cors(corsFromSite), async (request, response) => {
   // let duplicate = false;
   // const webhooksReference = db.collection("webhooks");
   // const usersReference = db.collection("users");
@@ -177,7 +192,7 @@ app.post("/paypal", async (request, response) => {
   response.status(200).send("ok");
 });
 
-app.get("/subscriptions", async (request, response) => {
+app.get("/subscriptions", cors(corsFromSite), async (request, response) => {
   let { authorized, userData } = await checkAuth(request);
 
   if (authorized) {
@@ -196,7 +211,7 @@ app.get("/subscriptions", async (request, response) => {
   }
 });
 
-app.get("/payment", async (request, response) => {
+app.get("/payment", cors(corsFromSite), async (request, response) => {
   // Here, OrdersCreateRequest() creates a POST request to /v2/checkout/orders
   let orderRequest = new paypal.orders.OrdersCreateRequest();
   orderRequest.requestBody({
@@ -223,6 +238,7 @@ app.get("/payment", async (request, response) => {
 
 app.get(
   "/subscription/:site/:subscriptionID/cancel",
+  cors(corsFromSite),
   async (request, response) => {
     const { subscriptionID, site } = request.params;
     console.log(subscriptionID, site);
@@ -257,18 +273,18 @@ app.get(
   }
 );
 
-// app.post("/check-sites", async (request, response) => {
+// app.post("/check-sites", cors(corsFromSite), async (request, response) => {
 //   console.log(request);
 //   response.status(200).send("OK");
 // });
 
-app.get("/bookings", async (request, response) => {
+app.get("/bookings", cors(corsFromSite), async (request, response) => {
   const bookingsCollectionReference = db.collectionGroup("bookings");
   const snapshot = await bookingsCollectionReference.get();
   let data = snapshot.docs.map((doc) => doc.data());
   response.status(200).send(data);
 });
-app.post("/manual-entry", async (request, response) => {
+app.post("/manual-entry", cors(corsFromSite), async (request, response) => {
   const { site, startDate, endDate, name, email, notes } = request.body.data;
   const FieldValue = admin.firestore.FieldValue;
 
@@ -304,7 +320,7 @@ app.post("/manual-entry", async (request, response) => {
     });
   response.status(200).send("OK");
 });
-app.post("/contact-email", async (request, response) => {
+app.post("/contact-email", cors(corsFromSite), async (request, response) => {
   const { name, email, message } = request.body.data.form;
   const { token } = request.body.data;
   const SECRET_KEY = process.env.RECAPTCHA_SECRET_KEY;
@@ -341,7 +357,7 @@ app.post("/contact-email", async (request, response) => {
     }
   }
 });
-app.get("/check-auth", async (request, response) => {
+app.get("/check-auth", cors(corsFromSite), async (request, response) => {
   let { authorized } = await checkAuth(request);
   if (authorized) {
     response.status(200).send({ success: true });
@@ -350,35 +366,45 @@ app.get("/check-auth", async (request, response) => {
   }
 });
 
-app.post("/confirmation-email", async (request, response) => {
-  const { subscriptionID, startDate, endDate, user, site } = request.body.data;
-  const msg = {
-    to: user.email,
-    from: SENDGRID_EMAIL,
-    subject: "Booking confirmation from llanoestacadorvpark.com",
-    html: `
+app.post(
+  "/confirmation-email",
+  cors(corsFromSite),
+  async (request, response) => {
+    const {
+      subscriptionID,
+      startDate,
+      endDate,
+      user,
+      site,
+    } = request.body.data;
+    const msg = {
+      to: user.email,
+      from: SENDGRID_EMAIL,
+      subject: "Booking confirmation from llanoestacadorvpark.com",
+      html: `
     <p>Hello, ${user.name}</p>
     <p>This email is being sent to confirm that your booking from ${dayjs(
       startDate
     ).format("MM-DD-YYYY")} through ${dayjs(endDate).format(
-      "MM-DD-YYYY"
-    )} for site ${site} has been completed.</p>
+        "MM-DD-YYYY"
+      )} for site ${site} has been completed.</p>
     <p>If you did not make this booking please email us at ${SENDGRID_EMAIL}.</p>
     <p>Booking ID: ${subscriptionID}</p>
     `,
-  };
-  sgMail
-    .send(msg)
-    .then(() => {
-      console.log("Email sent");
-    })
-    .catch((err) => {
-      console.error(err);
-    });
-  response.status(200).send("OK");
-});
+    };
+    sgMail
+      .send(msg)
+      .then(() => {
+        console.log("Email sent");
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+    response.status(200).send("OK");
+  }
+);
 
-app.get("/sites", async (request, response) => {
+app.get("/sites", cors(corsFromSite), async (request, response) => {
   let { authorized, userData } = await checkAuth(request);
 
   const sitesRef = db.collection("sites");

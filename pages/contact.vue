@@ -32,8 +32,13 @@
       </b-card>
     </b-container>
     <b-modal id="error-modal" hide-footer title="Contact Form Error">
-      <p class="my-4">
+      <p class="my-2">
         There was an error sending the message. Please try again.
+      </p>
+    </b-modal>
+    <b-modal id="success-modal" hide-footer title="Message Sent">
+      <p class="my-2">
+        Your message was sent. We will get back to you as soon as possible.
       </p>
     </b-modal>
   </div>
@@ -68,6 +73,7 @@ export default {
           });
 
         await this.$recaptcha.reset();
+        this.$bvModal.show("success-modal");
       } catch (e) {
         this.$bvModal.show("error-modal");
         console.log(e);
