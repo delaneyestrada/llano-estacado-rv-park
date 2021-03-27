@@ -16,7 +16,7 @@
         <div class="icon">
           <font-awesome-icon :icon="['fas', 'phone-square']" />
         </div>
-        <span>(806) 777-1059</span>
+        <span>(806) 928-4508</span>
       </div>
       <div class="info">
         <nuxt-link to="/contact">
@@ -24,7 +24,7 @@
             <font-awesome-icon :icon="['fas', 'envelope']" />
           </div>
         </nuxt-link>
-        <span class="hide-small">llanoestacadorvpark@gmail.com</span>
+        <span class="hide-small">llanollano2021@yahoo.com</span>
       </div>
     </div>
     <client-only>
@@ -346,6 +346,10 @@ body {
   // md: 720px,
   // lg: 960px,
   // xl: 1140px,
+}
+
+h2.header {
+  font-weight: 700;
 }
 
 .info-bar {

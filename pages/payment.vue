@@ -68,29 +68,40 @@ export default {
         proratedCharge,
         immediate,
       } = this.bookingDetails;
-      // const numMonths = this.reservationDetails.numMonths;
-      // const startNextMonth = startDate.add(1, "month").date(1);
-      // const numDaysUntilNextMonth = startNextMonth.diff(startDate, "day");
-      // const daysInMonth = startDate.daysInMonth();
-      // let proratedCharge =
-      //   (numDaysUntilNextMonth / daysInMonth) * this.monthlyRate;
-      // proratedCharge = proratedCharge.toFixed(2);
-      data.push({
+
+      // NOW CHARGE
+      let paymentObject = {
         paymentDate: "Now",
         paymentAmount: `$${
           interval == "weekly"
             ? this.$config.weeklyRate
             : this.$config.monthlyRate
         }`,
-      });
+      };
 
-      if (!immediate) {
+      if (interval == "monthly" && !immediate) {
+        paymentObject = {
+          paymentDate: "Now",
+          paymentAmount: `$${proratedCharge}`,
+        };
+      }
+
+      data.push(paymentObject);
+
+      // FIRST CYCLE CHARGE
+      if (!immediate && interval != "monthly") {
         data.push({
           paymentDate: startDate.format("MM/DD/YYYY"),
           paymentAmount: `$${proratedCharge}`,
         });
+      } else if (!immediate) {
+        data.push({
+          paymentDate: startDate.format("MM/DD/YYYY"),
+          paymentAmount: "$0",
+        });
       }
 
+      // THE REST OF THE CHARGES
       if (interval == "weekly") {
         getPaymentTableInfo(
           interval,
@@ -113,11 +124,20 @@ export default {
         };
 
         for (let i = 0; i < numIntervals; i++) {
+          let paymentAmount;
+          if (interval == "monthly" && !immediate && i == 0) {
+            paymentAmount = rate;
+          } else if (i == 0) {
+            paymentAmount = 0;
+          } else {
+            paymentAmount = rate;
+          }
+
           data.push({
             paymentDate: nextIntervalStart
               .add(i, intervalMap[interval])
               .format("MM/DD/YYYY"),
-            paymentAmount: `$${i == 0 ? 0 : rate}`,
+            paymentAmount: `$${paymentAmount}`,
           });
         }
       }

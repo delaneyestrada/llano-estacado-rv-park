@@ -71,9 +71,9 @@
           </div>
         </main>
       </b-tab>
-      <b-tab title="Billing">
+      <!-- <b-tab title="Billing">
         <BillingTable :subscriptions="subscriptions" />
-      </b-tab>
+      </b-tab> -->
       <b-tab title="Manual Entry">
         <!-- TODO: add notes field -->
         <b-card>
@@ -331,6 +331,12 @@ export default {
   },
   methods: {
     handleModalSubmit(data) {
+      let table = null;
+      if (typeof data === "object" && data !== null) {
+        console.log(data);
+        table = data.table;
+        data = data.data;
+      }
       const url = `${this.$config.functionsURL}/webApi/subscription/${data.site}/${data.subscriptionID}/cancel`;
       this.$axios
         .get(url)
@@ -338,6 +344,14 @@ export default {
           this.getSitesAdmin();
           this.getBookings();
           this.clearBookingState();
+        })
+        .catch((e) => {
+          console.error(e);
+        })
+        .then(() => {
+          if (table) {
+            table.refresh();
+          }
         })
         .catch((e) => {
           console.error(e);

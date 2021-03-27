@@ -6,9 +6,9 @@ const cors = require("cors");
 const axios = require("axios");
 const querystring = require("querystring");
 const dotenv = require("dotenv").config();
-const sgMail = require("@sendgrid/mail");
 const dayjs = require("dayjs");
 const { nanoid } = require("nanoid");
+const nodemailer = require("nodemailer");
 
 // Firebase Initialization
 admin.initializeApp({
@@ -32,19 +32,23 @@ const app = express();
 // app.use(cors({ origin: "http://dev.local:8088" }));
 app.options("*", cors());
 
-const corsFromSite = { origin: "http://dev.local:8088" };
+// const corsFromSite = {
+//   origin: "http://dev.local:8088",
+// };
+const corsFromSite = {
+  origin: "https://605e824f6369ff522ae6fddb--llanoestacadorvpark.netlify.app",
+};
+const corsOpen = { origin: true };
 const corsFromPaypal = { origin: "https://www.paypal.com/ipn" };
 
 const db = admin.firestore();
 const {
   PAYPAL_CLIENT_ID,
   PAYPAL_CLIENT_SECRET,
-  SENDGRID_API_KEY,
+  EMAIL_USERNAME,
+  EMAIL_PASSWORD,
   ENVIRONMENT,
-  SENDGRID_EMAIL,
 } = process.env;
-
-sgMail.setApiKey(SENDGRID_API_KEY);
 
 // Creating an environment
 let paypalClientId = PAYPAL_CLIENT_ID;
@@ -68,7 +72,7 @@ function getPaypalURI() {
 }
 
 // This sample uses SandboxEnvironment. In production, use LiveEnvironment
-let environment = new paypal.core.SandboxEnvironment(
+let environment = new paypal.core.LiveEnvironment(
   paypalClientId,
   paypalClientSecret
 );
@@ -86,7 +90,7 @@ app.post("/paypal-ipn", cors(corsFromPaypal), async (req, res) => {
   let ipnTransactionMessage = req.body;
   // Convert JSON ipn data to a query string since Google Cloud Function does not expose raw request data.
   let formUrlEncodedBody = querystring.stringify(ipnTransactionMessage);
-  // Build the body of the verification post message by prefixing 'cmd=_notify-validate'.
+  // Build the body of the v~erification post message by prefixing 'cmd=_notify-validate'.
   let verificationBody = `cmd=_notify-validate&${formUrlEncodedBody}`;
 
   let options = {
@@ -140,7 +144,7 @@ app.post("/paypal-ipn", cors(corsFromPaypal), async (req, res) => {
       }
     });
 });
-app.post("/paypal", cors(corsFromSite), async (request, response) => {
+app.post("/paypal", cors(corsFromPaypal), async (request, response) => {
   // let duplicate = false;
   // const webhooksReference = db.collection("webhooks");
   // const usersReference = db.collection("users");
@@ -273,7 +277,7 @@ app.get(
   }
 );
 
-// app.post("/check-sites", cors(corsFromSite), async (request, response) => {
+// app.post("/check-sites",  cors(corsFromSite), async (request, response) => {
 //   console.log(request);
 //   response.status(200).send("OK");
 // });
@@ -320,49 +324,66 @@ app.post("/manual-entry", cors(corsFromSite), async (request, response) => {
     });
   response.status(200).send("OK");
 });
-app.post("/contact-email", cors(corsFromSite), async (request, response) => {
-  const { name, email, message } = request.body.data.form;
-  const { token } = request.body.data;
-  const SECRET_KEY = process.env.RECAPTCHA_SECRET_KEY;
 
-  if (!token) {
-    response.status(500).send("No Token");
-  } else {
-    const res = await axios.get(
-      `https://www.google.com/recaptcha/api/siteverify?secret=${SECRET_KEY}&response=${token}`
-    );
-    console.log(res);
-    if (res.data.success) {
-      const msg = {
-        to: SENDGRID_EMAIL,
-        from: SENDGRID_EMAIL,
-        subject: "Contact form submission from llanoestacadorvpark.com",
-        html: `
-      <div><strong>Name: </strong> ${name}</div>
-      <div><strong>Email: </strong> ${email}</div>
-      <div><strong>Message: </strong> ${message}</div>
-      `,
-      };
-      sgMail
-        .send(msg)
-        .then(() => {
-          console.log("Email sent");
-        })
-        .catch((err) => {
-          console.error(err);
-        });
-      response.status(200).send("Message sent");
-    } else {
-      response.status(500).send("Invalid token");
-    }
-  }
-});
 app.get("/check-auth", cors(corsFromSite), async (request, response) => {
   let { authorized } = await checkAuth(request);
   if (authorized) {
     response.status(200).send({ success: true });
   } else {
     response.status(401).send({ success: false });
+  }
+});
+
+const getTransporter = () => {
+  const transporter = nodemailer.createTransport({
+    service: "Yahoo",
+    auth: {
+      user: EMAIL_USERNAME,
+      pass: EMAIL_PASSWORD,
+    },
+  });
+
+  return transporter;
+};
+
+app.post("/contact-email", cors(corsOpen), async (request, response) => {
+  const { name, email, message } = request.body.data.form;
+  const { token } = request.body.data;
+  const SECRET_KEY = process.env.RECAPTCHA_SECRET_KEY;
+  const transporter = getTransporter();
+
+  console.log(token, SECRET_KEY);
+
+  if (!token) {
+    response.status(500).send("No Token");
+  } else {
+    try {
+      const res = await axios.get(
+        `https://www.google.com/recaptcha/api/siteverify?secret=${SECRET_KEY}&response=${token}`
+      );
+      console.log(res);
+      if (res.data.success) {
+        const msg = {
+          to: EMAIL_USERNAME,
+          from: EMAIL_USERNAME,
+          subject: "Contact form submission from llanoestacadorvpark.com",
+          html: `
+      <div><strong>Name: </strong> ${name}</div>
+      <div><strong>Email: </strong> ${email}</div>
+      <div><strong>Message: </strong> ${message}</div>
+      `,
+        };
+        const info = await transporter.sendMail(msg);
+
+        console.log("Message info: " + info);
+
+        response.status(200).send("Message sent");
+      } else {
+        response.status(500).send("Invalid token");
+      }
+    } catch (e) {
+      console.error(e);
+    }
   }
 });
 
@@ -377,9 +398,10 @@ app.post(
       user,
       site,
     } = request.body.data;
+    const transporter = getTransporter();
     const msg = {
       to: user.email,
-      from: SENDGRID_EMAIL,
+      from: EMAIL_USERNAME,
       subject: "Booking confirmation from llanoestacadorvpark.com",
       html: `
     <p>Hello, ${user.name}</p>
@@ -388,14 +410,15 @@ app.post(
     ).format("MM-DD-YYYY")} through ${dayjs(endDate).format(
         "MM-DD-YYYY"
       )} for site ${site} has been completed.</p>
-    <p>If you did not make this booking please email us at ${SENDGRID_EMAIL}.</p>
+    <p>If you did not make this booking please email us at ${EMAIL_USERNAME}.</p>
     <p>Booking ID: ${subscriptionID}</p>
     `,
     };
-    sgMail
-      .send(msg)
+
+    transporter
+      .sendMail(msg)
       .then(() => {
-        console.log("Email sent");
+        console.log("Message sent");
       })
       .catch((err) => {
         console.error(err);
@@ -411,7 +434,7 @@ app.get("/sites", cors(corsFromSite), async (request, response) => {
   const snapshot = await sitesRef.get();
 
   let data = snapshot.docs.map((doc) => doc.data());
-  if (!authorized || !userData.email == "admin@admin.com") {
+  if (!authorized || !userData.email == "llanollano2021@yahoo.com") {
     data = data.map((doc) => {
       return Object.assign({}, doc, { admin: undefined });
     });

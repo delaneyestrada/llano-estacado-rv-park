@@ -53,8 +53,8 @@ export default {
     };
     if (
       authUser &&
-      authUser.email == "admin@admin.com" &&
-      this.$fire.auth.currentUser.email == "admin@admin.com"
+      authUser.email == "llanollano2021@yahoo.com" &&
+      this.$fire.auth.currentUser.email == "llanollano2021@yahoo.com"
     ) {
       authUserObj.isAdmin = true;
     }

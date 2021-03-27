@@ -1,29 +1,39 @@
 <template>
   <div id="site-map">
     <b-form inline id="top-form" @submit.prevent.stop="onSubmit">
-      <label class="mr-sm-2 ml-3" for="booking-select">Interval: </label>
-      <b-form-select
-        id="booking-select"
-        v-model="form.bookingType"
-        @change="setReservationDetails"
+      <div id="booking-type-container" class="form-group-container">
+        <label class="mr-sm-2 ml-3" for="booking-select">Interval: </label>
+        <b-form-select
+          id="booking-select"
+          v-model="form.bookingType"
+          @change="setReservationDetails"
+          size="sm"
+        >
+          <b-form-select-option value="monthly">Monthly</b-form-select-option>
+          <b-form-select-option value="weekly">Weekly</b-form-select-option>
+        </b-form-select>
+      </div>
+      <div id="start-date-container" class="form-group-container">
+        <label class="mr-sm-2 ml-3" for="start-date-input">Start Date: </label>
+        <b-form-datepicker
+          id="start-date-input"
+          v-model.trim="$v.form.startDate.$model"
+          :state="validateState('form.startDate')"
+          :date-format-options="dateOptions"
+          :min="tomorrow"
+          :max="oneYearFromNow"
+          size="sm"
+          @input="setReservationDetails"
+        ></b-form-datepicker>
+        <b-form-invalid-feedback v-if="!$v.form.startDate.required"
+          >Start date is required</b-form-invalid-feedback
+        >
+      </div>
+      <div
+        id="num-months"
+        class="d-flex form-group-container"
+        v-if="form.bookingType == 'monthly'"
       >
-        <b-form-select-option value="monthly">Monthly</b-form-select-option>
-        <b-form-select-option value="weekly">Weekly</b-form-select-option>
-      </b-form-select>
-      <label class="mr-sm-2 ml-3" for="start-date-input">Start Date: </label>
-      <b-form-datepicker
-        id="start-date-input"
-        v-model.trim="$v.form.startDate.$model"
-        :state="validateState('form.startDate')"
-        :date-format-options="dateOptions"
-        :min="tomorrow"
-        :max="oneYearFromNow"
-        @input="setReservationDetails"
-      ></b-form-datepicker>
-      <b-form-invalid-feedback v-if="!$v.form.startDate.required"
-        >Start date is required</b-form-invalid-feedback
-      >
-      <div id="num-months" class="d-flex" v-if="form.bookingType == 'monthly'">
         <label class="mr-sm-2 ml-3" for="num-months-input">Months: </label>
         <b-form-input
           id="num-months-input"
@@ -32,6 +42,7 @@
           type="number"
           max="12"
           min="1"
+          size="sm"
           @change="setReservationDetails"
         ></b-form-input>
         <b-form-invalid-feedback v-if="!$v.form.numMonths.required"
@@ -50,6 +61,7 @@
           type="number"
           max="52"
           min="1"
+          size="sm"
           @change="setReservationDetails"
         ></b-form-input>
         <b-form-invalid-feedback v-if="!$v.form.numWeeks.required"
@@ -59,31 +71,34 @@
           >Number of weeks must be a number</b-form-invalid-feedback
         >
       </div>
+      <div id="site-select-container" class="form-group-container">
+        <label class="mr-sm-2 ml-3" for="site-select">Site:</label>
 
-      <label class="mr-sm-2 ml-3" for="site-select">Site:</label>
-
-      <b-form-select
-        id="site-select"
-        v-model="form.site"
-        v-if="validSites.length"
-        @change="setReservationDetails"
-      >
-        <b-form-select-option
-          v-for="site in validSites"
-          :key="site.id"
-          :value="site.id"
-          >{{ site.id }}</b-form-select-option
-        >
-      </b-form-select>
-      <b-form-select id="site-select" v-model="form.site" v-else>
-        <b-form-select-option
-          v-for="site in sites"
-          :key="site.id"
-          :value="site.id"
+        <b-form-select
+          id="site-select"
+          v-model="form.site"
+          v-if="validSites.length"
+          size="sm"
           @change="setReservationDetails"
-          >{{ site.id }}</b-form-select-option
         >
-      </b-form-select>
+          <b-form-select-option
+            v-for="site in validSites"
+            :key="site.id"
+            :value="site.id"
+            >{{ site.id }}</b-form-select-option
+          >
+        </b-form-select>
+        <b-form-select id="site-select" v-model="form.site" v-else>
+          <b-form-select-option
+            v-for="site in sites"
+            :key="site.id"
+            :value="site.id"
+            @change="setReservationDetails"
+            size="sm"
+            >{{ site.id }}</b-form-select-option
+          >
+        </b-form-select>
+      </div>
 
       <b-button type="submit" class="ml-auto" variant="primary"
         >Book It</b-button
@@ -203,6 +218,7 @@ export default {
           let numDaysUntilNextMonth = null;
           const daysInMonth = startDate.daysInMonth();
           let immediate = false;
+          let paymentStart = startDate.add(1, "month");
 
           if (startDate.date() == 1) {
             startNextMonth = startDate;
@@ -211,6 +227,7 @@ export default {
           } else {
             startNextMonth = startDate.add(1, "month").date(1);
             numDaysUntilNextMonth = startNextMonth.diff(startDate, "day");
+            paymentStart = startNextMonth; // Changed
           }
           const proratedCharge = (
             (numDaysUntilNextMonth / daysInMonth) *
@@ -220,9 +237,7 @@ export default {
           const endDate = startNextMonth
             .add(numIntervals + 1, "month")
             .subtract(1, "day");
-          console.log("end date: ", startNextMonth, numIntervals, endDate);
 
-          const paymentStart = startDate.add(1, "month");
           return {
             interval: "monthly",
             nextIntervalStart: startNextMonth,
@@ -717,6 +732,16 @@ export default {
   #top-form {
     background-color: darken(white, 5%);
     padding: 1em;
+    // display: grid;
+    // grid-template-columns: repeat(auto-fill, minmax(215px, 1fr));
+    label {
+      font-size: 0.8em;
+      margin-right: 1em;
+    }
+  }
+  .form-group-container {
+    display: flex;
+    padding: 1em 0.5em;
   }
 }
 </style>

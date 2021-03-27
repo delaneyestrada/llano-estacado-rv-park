@@ -117,11 +117,21 @@ export default {
     justify-content: center;
     padding: 4rem;
   }
-  .card {
-    display: grid;
-    grid-template-columns: 1fr 2fr;
-    width: 100%;
-    border: 0;
+  @media screen and (min-width: 775px) {
+    .card {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      width: 100%;
+      border: 0;
+    }
+  }
+  @media screen and (max-width: 775px) {
+    .card {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      border: 0;
+    }
   }
 }
 .card {

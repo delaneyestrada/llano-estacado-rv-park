@@ -231,7 +231,7 @@ export default {
     async redirect(user) {
       if (this.reservationDetails && this.reservationDetails?.redirectPayment) {
         this.$router.push("/payment");
-      } else if (user.email == "admin@admin.com") {
+      } else if (user.email == "llanollano2021@yahoo.com") {
         this.$router.push("/admin");
       } else if (user) {
         this.$router.push("/dashboard");

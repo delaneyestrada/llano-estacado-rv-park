@@ -267,13 +267,9 @@ export default {
           const today = this.$dayjs();
 
           if (this.showOption == "end") {
-            return (
-              today.isBefore(endDate, "day") || today.isSame(endDate, "day")
-            );
+            return today.isBefore(endDate, "day");
           } else if (this.showOption == "start") {
-            return (
-              today.isBefore(startDate, "day") || today.isSame(startDate, "day")
-            );
+            return today.isBefore(startDate, "day");
           } else {
             return true;
           }
@@ -291,7 +287,8 @@ export default {
       }
     },
     handleCancel(data) {
-      this.$emit("cancel", data);
+      const table = this.$refs.table;
+      this.$emit("cancel", { data, table });
       this.$refs.table.refresh();
     },
     resetInfoModal() {

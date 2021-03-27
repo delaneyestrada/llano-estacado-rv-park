@@ -3,7 +3,7 @@ export default function ({ store, redirect, route }) {
     ? redirect("/")
     : "";
   store.state.authUser != null &&
-  store.state.authUser.email != "admin@admin.com" &&
+  store.state.authUser.email != "llanollano2021@yahoo.com" &&
   isAdminRoute(route)
     ? redirect("/")
     : "";

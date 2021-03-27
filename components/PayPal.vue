@@ -28,7 +28,7 @@ export default {
   mounted: function () {
     const script = document.createElement("script");
     script.src =
-      "https://www.paypal.com/sdk/js?client-id=AXgplH_FFZXB5FWHAhjurvcisj0uXHjyHAQvUnrjlUmSD7g5E4kNTU60nNCEttnFSNYYdhlkv99e0f77&vault=true&intent=subscription";
+      "https://www.paypal.com/sdk/js?client-id=AQvgPiDDOra8LWuzaNxmuiy3LDpMli7GW732ZfHkjQmA8eL0pSHimU99HhNZt1YVcJSFkyu5xyypPr46&vault=true&intent=subscription";
     script.addEventListener("load", this.setLoaded);
     document.body.appendChild(script);
   },
@@ -60,6 +60,8 @@ export default {
           paymentStart,
         } = this.bookingDetails;
         let { startDate, endDate } = this.bookingDetails;
+
+        console.log(paymentStart);
 
         startDate = setEndOfDay(startDate);
         endDate = setEndOfDay(endDate);

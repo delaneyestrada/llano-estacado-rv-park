@@ -7,25 +7,50 @@
         <b-card>
           <h3>Lubbock's Premium RV Park</h3>
           <span>
-            Lorem, ipsum dolor sit amet consectetur adipisicing elit. Quibusdam
-            placeat cum ipsa dolore magnam, dicta saepe omnis in at soluta
-            molestiae. Neque molestiae magnam obcaecati labore asperiores,
-            quibusdam dicta deleniti? Hic reprehenderit numquam quae, ducimus
-            quaerat recusandae libero suscipit modi delectus fugit repudiandae
-            quia deserunt? Distinctio saepe in rerum minus minima cum aliquam a
-            expedita facere! Repudiandae alias quibusdam vitae? Quo numquam
-            mollitia quaerat minus quam, libero porro doloremque veniam eum,
-            velit accusantium itaque molestiae culpa perspiciatis minima
-            assumenda omnis, ut aperiam. Ad quo sequi debitis odio recusandae
-            voluptate nesciunt?
+            Located conveniently near highways 84, 87, and the loop 289. We
+            offer everything you need for a comfortable short or long-term stay.
           </span>
           <h4 class="my-3">Amenities</h4>
-          <span
-            >Lorem ipsum dolor sit amet consectetur adipisicing elit. Nesciunt
-            earum consequatur, eveniet illum totam alias, cupiditate
-            reprehenderit reiciendis illo optio, adipisci commodi natus
-            voluptatum! Cupiditate corrupti magnam eveniet molestiae fuga!</span
-          >
+          <div class="amenities-list">
+            <div class="amenity-item">
+              <font-awesome-icon class="icon" :icon="['fas', 'user-friends']" />
+              <span>Enclosed Community Center</span>
+            </div>
+            <div class="amenity-item">
+              <font-awesome-icon class="icon" :icon="['fas', 'coins']" />
+              <span>Onsite Vending Machine</span>
+            </div>
+            <div class="amenity-item">
+              <font-awesome-icon class="icon" :icon="['fas', 'tint']" />
+              <span>Laundry Center</span>
+            </div>
+            <div class="amenity-item">
+              <font-awesome-icon class="icon" :icon="['fas', 'utensils']" />
+              <span>Picnic Center</span>
+            </div>
+            <div class="amenity-item">
+              <font-awesome-icon class="icon" :icon="['fas', 'bolt']" />
+              <span>20, 30, and 50 amp connections</span>
+            </div>
+            <div class="amenity-item">
+              <font-awesome-icon
+                class="icon"
+                :icon="['fas', 'money-bill-wave']"
+              />
+              <span>All Utilities Paid</span>
+            </div>
+            <div class="amenity-item">
+              <font-awesome-icon
+                class="icon"
+                :icon="['fas', 'expand-arrows-alt']"
+              />
+              <span>Oversized Lots</span>
+            </div>
+            <div class="amenity-item">
+              <font-awesome-icon class="icon" :icon="['fas', 'caravan']" />
+              <span>Pull-through spaces</span>
+            </div>
+          </div>
         </b-card>
       </div>
     </section>
@@ -52,6 +77,23 @@ export default {
   .card {
     width: 100%;
     border-radius: 0;
+  }
+}
+
+.amenities-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  .amenity-item {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 1em;
+    .icon {
+      font-size: 2em;
+      margin: 0.5em auto;
+    }
+    span {
+      text-align: center;
+    }
   }
 }
 </style>

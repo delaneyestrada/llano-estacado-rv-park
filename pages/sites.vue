@@ -17,9 +17,21 @@
             Monthly bookings are prorated from the day chosen to the beginning
             of the next month and continue monthly from the 1st.
           </li>
+          <li style="font-weight: bold">
+            (For monthly bookings not starting on the first of the month, the
+            upfront payment will be the prorated amount instead)
+          </li>
         </ul>
       </div>
-      <h2 class="header mb-2">Book Your Site</h2>
+      <h2 class="header mb-2 mt-5">Book Your Site</h2>
+      <ul class="prices">
+        <li>
+          Monthly: <span>${{ monthlyRate }}</span>
+        </li>
+        <li>
+          Weekly: <span>${{ weeklyRate }}</span>
+        </li>
+      </ul>
       <section id="site-picker">
         <SiteMap />
       </section>
@@ -30,6 +42,14 @@
 <script>
 export default {
   name: "Sites",
+  computed: {
+    monthlyRate() {
+      return this.$config.monthlyRate;
+    },
+    weeklyRate() {
+      return this.$config.weeklyRate;
+    },
+  },
 
   mounted() {
     this.$store.dispatch("getSites");
@@ -54,6 +74,19 @@ export default {
     left: 0;
     margin: 0.5rem 0 0 0.5rem;
     color: red;
+  }
+}
+
+.prices {
+  padding: 1rem;
+  outline: 1px solid $primary;
+  display: inline-block;
+  li {
+    list-style: none;
+
+    span {
+      font-weight: 600;
+    }
   }
 }
 </style>

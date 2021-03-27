@@ -4,24 +4,35 @@
       <h2 class="header mt-5 mb-2">Contact Us</h2>
       <b-card>
         <b-form @submit.prevent="onSubmit">
-          <b-form-group label="Name:" label-for="name-input">
+          <!-- <b-form
+          name="contact"
+          id="contact-form"
+          method="POST"
+          data-netlify="true"
+          enctype="application/x-www-form-urlencoded"
+          v-on:submit.prevent="handleFormSubmit"
+        > -->
+          <b-form-group label="Name" label-for="name-input">
             <b-form-input
               id="name-input"
               v-model="form.name"
+              name="name"
               required
             ></b-form-input>
           </b-form-group>
-          <b-form-group label="Email Address:" label-for="email-input">
+          <b-form-group label="Email Address" label-for="email-input">
             <b-form-input
               id="email-input"
               v-model="form.email"
+              name="email"
               required
             ></b-form-input>
           </b-form-group>
-          <b-form-group label="Message:" label-for="message-input">
+          <b-form-group label="Message" label-for="message-input">
             <b-form-textarea
               id="message-input"
               v-model="form.message"
+              name="message"
               rows="3"
               max-rows="6"
             ></b-form-textarea>
@@ -57,6 +68,39 @@ export default {
     };
   },
   methods: {
+    // encode(data) {
+    //   const formData = new FormData();
+
+    //   for (const key of Object.keys(data)) {
+    //     formData.append(key, data[key]);
+    //   }
+
+    //   return formData;
+    // },
+    // handleFormSubmit(e) {
+    //   const axiosConfig = {
+    //     header: { "Content-Type": "application/x-www-form-urlencoded" },
+    //   };
+
+    //   this.$axios
+    //     .post(
+    //       location.href,
+    //       this.encode({
+    //         "form-name": e.target.getAttribute("name"),
+    //         ...this.formData,
+    //       }),
+    //       axiosConfig
+    //     )
+    //     .then((data) => console.log(data))
+    //     .catch((error) => console.log(error))
+    //     .then(
+    //       (document.getElementById("contact-form").innerHTML = `
+    //         <div>
+    //             Thank you! We've received your message and will be in touch as soon as possible.
+    //         </div>
+    //         `)
+    //     );
+    // },
     async onSubmit() {
       try {
         const token = await this.$recaptcha.getResponse();
@@ -65,15 +109,15 @@ export default {
           .post(`${this.$config.functionsURL}/webApi/contact-email`, {
             data: { form: this.form, token: token },
           })
-          .then((res) => {
-            console.log(res);
+          .then(() => {
+            this.$bvModal.show("success-modal");
           })
           .catch((e) => {
+            this.$bvModal.show("error-modal");
             console.log(e);
           });
 
         await this.$recaptcha.reset();
-        this.$bvModal.show("success-modal");
       } catch (e) {
         this.$bvModal.show("error-modal");
         console.log(e);
