@@ -275,7 +275,7 @@ export default {
             this.$config.weeklyRate
           ).toFixed(2);
 
-          const paymentStart = startDate.add(1, "week");
+          const paymentStart = startDate.add(1, "week").subtract(1, "day");
 
           return {
             interval: "weekly",

@@ -21,7 +21,7 @@ export const paypalMonthly = ({
       },
       "tenure_type": "REGULAR",
       "sequence": 1,
-      "total_cycles": (reservationDetails.numMonths - 1).toString(),
+      "total_cycles": reservationDetails.numMonths.toString(),
     },
   ];
 
@@ -66,7 +66,9 @@ export const paypalMonthly = ({
       ? "P-5CS126058S539973RMBN4XXY"
       : "P-3JA10090V22266101MBN4YGY",
     "custom_id": reservationDetails.site,
-    "start_time": paymentStart.toISOString(),
+    "start_time": !immediate
+      ? paymentStart.subtract(1, "day").toISOString()
+      : paymentStart.toISOString(),
     "plan": createPlan(),
   };
 

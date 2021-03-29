@@ -67,78 +67,92 @@ export default {
         numDaysNextInterval,
         proratedCharge,
         immediate,
+        numIntervals,
       } = this.bookingDetails;
-
-      // NOW CHARGE
-      let paymentObject = {
-        paymentDate: "Now",
-        paymentAmount: `$${
-          interval == "weekly"
-            ? this.$config.weeklyRate
-            : this.$config.monthlyRate
-        }`,
-      };
-
-      if (interval == "monthly" && !immediate) {
-        paymentObject = {
+      console.log(numIntervals);
+      if (numIntervals == 0) {
+        let paymentObject = {
           paymentDate: "Now",
-          paymentAmount: `$${proratedCharge}`,
+          paymentAmount: `$${
+            interval == "weekly"
+              ? this.$config.weeklyRate
+              : this.$config.monthlyRate + parseFloat(proratedCharge)
+          }`,
         };
-      }
 
-      data.push(paymentObject);
-
-      // FIRST CYCLE CHARGE
-      if (!immediate && interval != "monthly") {
-        data.push({
-          paymentDate: startDate.format("MM/DD/YYYY"),
-          paymentAmount: `$${proratedCharge}`,
-        });
-      } else if (!immediate) {
-        data.push({
-          paymentDate: startDate.format("MM/DD/YYYY"),
-          paymentAmount: "$0",
-        });
-      }
-
-      // THE REST OF THE CHARGES
-      if (interval == "weekly") {
-        getPaymentTableInfo(
-          interval,
-          this.reservationDetails.numWeeks,
-          this.$config.weeklyRate
-        );
-      } else if (interval == "monthly") {
-        getPaymentTableInfo(
-          interval,
-          this.reservationDetails.numMonths,
-          this.$config.monthlyRate
-        );
+        data.push(paymentObject);
       } else {
-        alert("error");
-      }
-      function getPaymentTableInfo(interval, numIntervals, rate) {
-        const intervalMap = {
-          weekly: "week",
-          monthly: "month",
+        // NOW CHARGE
+        let paymentObject = {
+          paymentDate: "Now",
+          paymentAmount: `$${
+            interval == "weekly"
+              ? this.$config.weeklyRate
+              : this.$config.monthlyRate
+          }`,
         };
 
-        for (let i = 0; i < numIntervals; i++) {
-          let paymentAmount;
-          if (interval == "monthly" && !immediate && i == 0) {
-            paymentAmount = rate;
-          } else if (i == 0) {
-            paymentAmount = 0;
-          } else {
-            paymentAmount = rate;
-          }
+        if (interval == "monthly" && !immediate) {
+          paymentObject = {
+            paymentDate: "Now",
+            paymentAmount: `$${proratedCharge}`,
+          };
+        }
 
+        data.push(paymentObject);
+
+        // FIRST CYCLE CHARGE
+        if (!immediate && interval != "monthly") {
           data.push({
-            paymentDate: nextIntervalStart
-              .add(i, intervalMap[interval])
-              .format("MM/DD/YYYY"),
-            paymentAmount: `$${paymentAmount}`,
+            paymentDate: startDate.format("MM/DD/YYYY"),
+            paymentAmount: `$${proratedCharge}`,
           });
+        } else if (!immediate) {
+          data.push({
+            paymentDate: startDate.format("MM/DD/YYYY"),
+            paymentAmount: "$0",
+          });
+        }
+
+        // THE REST OF THE CHARGES
+        if (interval == "weekly") {
+          getPaymentTableInfo(
+            interval,
+            this.reservationDetails.numWeeks,
+            this.$config.weeklyRate
+          );
+        } else if (interval == "monthly") {
+          getPaymentTableInfo(
+            interval,
+            this.reservationDetails.numMonths,
+            this.$config.monthlyRate
+          );
+        } else {
+          alert("error");
+        }
+        function getPaymentTableInfo(interval, numIntervals, rate) {
+          const intervalMap = {
+            weekly: "week",
+            monthly: "month",
+          };
+
+          for (let i = 0; i < numIntervals; i++) {
+            let paymentAmount;
+            if (interval == "monthly" && !immediate && i == 0) {
+              paymentAmount = rate;
+            } else if (i == 0) {
+              paymentAmount = 0;
+            } else {
+              paymentAmount = rate;
+            }
+
+            data.push({
+              paymentDate: nextIntervalStart
+                .add(i, intervalMap[interval])
+                .format("MM/DD/YYYY"),
+              paymentAmount: `$${paymentAmount}`,
+            });
+          }
         }
       }
       return data;
@@ -149,6 +163,22 @@ export default {
   },
   methods: {
     onSubscribeSuccess(e) {
+      // const bookDates = {
+      //   start: startDate.toISOString(),
+      //   end: endDate.toISOString(),
+      //   paypalSubscriptionID: `manual-${this.getRandomInt(
+      //     0,
+      //     1000000
+      //   )}`,
+      // };
+
+      // const successData = {
+      //   type: "one-time",
+      //   startDate: startDate.toISOString(),
+      //   endDate: endDate.toISOString(),
+      //   bookDates,
+      //   user: user,
+      // };
       const db = this.$fire.firestore;
       const FieldValue = this.$fireModule.firestore.FieldValue;
 
@@ -169,7 +199,8 @@ export default {
           endDate: data.endDate,
           interval: data.interval,
           numIntervals: data.numIntervals,
-          status: "Initiated",
+          status:
+            data.interval == "one-time" ? "One Time Completed" : "Initiated",
           admin: {
             uid: data.user.uid,
             userEmail: data.user.email,
@@ -181,6 +212,7 @@ export default {
       this.$router.push({ name: "success", params: e });
     },
     sendConfirmationEmail(data) {
+      console.log("sending email");
       console.log(data);
       return this.$axios
         .post(`${this.$config.functionsURL}/webApi/confirmation-email`, {

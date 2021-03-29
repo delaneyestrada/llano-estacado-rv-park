@@ -32,12 +32,12 @@ const app = express();
 // app.use(cors({ origin: "http://dev.local:8088" }));
 app.options("*", cors());
 
-// const corsFromSite = {
-//   origin: "http://dev.local:8088",
-// };
 const corsFromSite = {
-  origin: "https://605e824f6369ff522ae6fddb--llanoestacadorvpark.netlify.app",
+  origin: "http://dev.local:8088",
 };
+// const corsFromSite = {
+//   origin: "https://6061173cfd0e7c539fbaa69c--llanoestacadorvpark.netlify.app",
+// };
 const corsOpen = { origin: true };
 const corsFromPaypal = { origin: "https://www.paypal.com/ipn" };
 
@@ -105,7 +105,14 @@ app.post("/paypal-ipn", cors(corsFromPaypal), async (req, res) => {
   const body = req.body;
   const subscriptionGroupReference = db.collectionGroup("subscriptions");
 
-  const subscriptionId = body.recurring_payment_id;
+  let subscriptionId;
+  if (body.recurring_payment_id) {
+    subscriptionId = body.recurring_payment_id;
+  } else {
+    subscriptionId = body.txn_id;
+  }
+
+  console.log(body);
 
   let updateDoc = {
     status: body.profile_status,
@@ -133,16 +140,17 @@ app.post("/paypal-ipn", cors(corsFromPaypal), async (req, res) => {
 
       break;
   }
-
-  subscriptionGroupReference
-    .where("id", "==", subscriptionId)
-    .get()
-    .then(function (querySnapshot) {
-      if (!querySnapshot.empty) {
-        const doc = querySnapshot.docs[0];
-        const docRef = doc.ref.update(updateDoc);
-      }
-    });
+  if (!body.txn_type == "express_checkout") {
+    subscriptionGroupReference
+      .where("id", "==", subscriptionId)
+      .get()
+      .then(function (querySnapshot) {
+        if (!querySnapshot.empty) {
+          const doc = querySnapshot.docs[0];
+          const docRef = doc.ref.update(updateDoc);
+        }
+      });
+  }
 });
 app.post("/paypal", cors(corsFromPaypal), async (request, response) => {
   // let duplicate = false;
@@ -399,6 +407,7 @@ app.post(
       site,
     } = request.body.data;
     const transporter = getTransporter();
+    console.log(user.email, EMAIL_USERNAME);
     const msg = {
       to: user.email,
       from: EMAIL_USERNAME,

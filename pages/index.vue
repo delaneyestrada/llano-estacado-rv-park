@@ -9,14 +9,13 @@
       <img src="@/static/rv-driving-llano.jpg" alt="" />
     </div>
     <main>
-      <b-card no-body>
-        <b-carousel
-          id="carousel-1"
-          controls
-          background="#ababab"
-          style="text-shadow: 1px 1px 2px #333"
-        >
-          <!-- <b-carousel-slide >
+      <b-carousel
+        id="carousel-1"
+        controls
+        background="#ababab"
+        style="text-shadow: 1px 1px 2px #333"
+      >
+        <!-- <b-carousel-slide >
           <template #img>
             <div class="img-container">
               <img
@@ -27,13 +26,15 @@
             </div>
           </template>
         </b-carousel-slide> -->
-          <b-carousel-slide img-src="@/static/camper-site.jpg">
-          </b-carousel-slide>
-          <b-carousel-slide img-src="@/static/front-rv-parked.jpg">
-          </b-carousel-slide>
-          <b-carousel-slide img-src="@/static/side-rv-parked.jpg">
-          </b-carousel-slide>
-        </b-carousel>
+        <b-carousel-slide img-src="@/static/camper-site.jpg">
+        </b-carousel-slide>
+        <b-carousel-slide img-src="@/static/front-rv-parked.jpg">
+        </b-carousel-slide>
+        <b-carousel-slide img-src="@/static/side-rv-parked.jpg">
+        </b-carousel-slide>
+        <b-carousel-slide img-src="@/static/electrical.jpg"> </b-carousel-slide>
+      </b-carousel>
+      <b-card no-body>
         <div
           class="content d-flex justify-content-center align-items-center p-3"
         >
@@ -114,25 +115,40 @@ export default {
   }
   main {
     display: flex;
+    flex-direction: column;
     justify-content: center;
     padding: 4rem;
   }
-  @media screen and (min-width: 775px) {
-    .card {
-      display: grid;
-      grid-template-columns: 1fr 2fr;
-      width: 100%;
-      border: 0;
-    }
+
+  #carousel-1 * {
+    height: 40vh;
+    background-color: $dark;
   }
-  @media screen and (max-width: 775px) {
-    .card {
-      display: flex;
-      flex-direction: column;
-      width: 100%;
-      border: 0;
-    }
+
+  #carousel-1 a,
+  #carousel-1 a span {
+    background-color: transparent !important;
   }
+  #carousel-1 img {
+    object-fit: contain;
+  }
+
+  // @media screen and (min-width: 775px) {
+  //   .card {
+  //     display: grid;
+  //     grid-template-columns: 1fr 2fr;
+  //     width: 100%;
+  //     border: 0;
+  //   }
+  // }
+  // @media screen and (max-width: 775px) {
+  .card {
+    display: flex;
+    flex-direction: column;
+    border: 0;
+    border-radius: 0;
+  }
+  // }
 }
 .card {
   background-color: $secondary;
