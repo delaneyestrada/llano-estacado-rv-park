@@ -7,7 +7,9 @@ const axios = require("axios");
 const querystring = require("querystring");
 const dotenv = require("dotenv").config();
 const dayjs = require("dayjs");
-const { nanoid } = require("nanoid");
+const {
+  nanoid
+} = require("nanoid");
 const nodemailer = require("nodemailer");
 
 // Firebase Initialization
@@ -32,14 +34,18 @@ const app = express();
 // app.use(cors({ origin: "http://dev.local:8088" }));
 app.options("*", cors());
 
-const corsFromSite = {
-  origin: "http://dev.local:8088",
-};
 // const corsFromSite = {
-//   origin: "https://6061173cfd0e7c539fbaa69c--llanoestacadorvpark.netlify.app",
-// };
-const corsOpen = { origin: true };
-const corsFromPaypal = { origin: "https://www.paypal.com/ipn" };
+//   origin: "http://dev.local:8088",
+};
+const corsFromSite = {
+  origin: "https://www.llanoestacadorvpark.com",
+};
+const corsOpen = {
+  origin: true
+};
+const corsFromPaypal = {
+  origin: "https://www.paypal.com/ipn"
+};
 
 const db = admin.firestore();
 const {
@@ -61,6 +67,8 @@ const SANDBOX_PAYPAL_URL = "https://api-m.sandbox.paypal.com";
 const PRODUCTION_PAYPAL_URL = "https://api-m.paypal.com";
 
 const sandbox = ENVIRONMENT == "DEV" ? true : false;
+
+console.log("sandbox: ", sandbox);
 
 /** Production Postback URL */
 const PRODUCTION_VERIFY_URI = "https://ipnpb.paypal.com/cgi-bin/webscr";
@@ -205,7 +213,10 @@ app.post("/paypal", cors(corsFromPaypal), async (request, response) => {
 });
 
 app.get("/subscriptions", cors(corsFromSite), async (request, response) => {
-  let { authorized, userData } = await checkAuth(request);
+  let {
+    authorized,
+    userData
+  } = await checkAuth(request);
 
   if (authorized) {
     const subscriptionGroupReference = db.collectionGroup("subscriptions");
@@ -228,14 +239,12 @@ app.get("/payment", cors(corsFromSite), async (request, response) => {
   let orderRequest = new paypal.orders.OrdersCreateRequest();
   orderRequest.requestBody({
     intent: "CAPTURE",
-    purchase_units: [
-      {
-        amount: {
-          currency_code: "USD",
-          value: "1.00",
-        },
+    purchase_units: [{
+      amount: {
+        currency_code: "USD",
+        value: "1.00",
       },
-    ],
+    }, ],
   });
 
   // Call API with your client and get a response for your call
@@ -252,11 +261,16 @@ app.get(
   "/subscription/:site/:subscriptionID/cancel",
   cors(corsFromSite),
   async (request, response) => {
-    const { subscriptionID, site } = request.params;
+    const {
+      subscriptionID,
+      site
+    } = request.params;
     console.log(subscriptionID, site);
     const siteReference = db.collection("sites").doc(site);
     siteReference.get().then((snapshot) => {
-      const { booked } = snapshot.data();
+      const {
+        booked
+      } = snapshot.data();
       if (booked.length) {
         siteReference
           .update({
@@ -297,7 +311,14 @@ app.get("/bookings", cors(corsFromSite), async (request, response) => {
   response.status(200).send(data);
 });
 app.post("/manual-entry", cors(corsFromSite), async (request, response) => {
-  const { site, startDate, endDate, name, email, notes } = request.body.data;
+  const {
+    site,
+    startDate,
+    endDate,
+    name,
+    email,
+    notes
+  } = request.body.data;
   const FieldValue = admin.firestore.FieldValue;
 
   const manualId = nanoid();
@@ -334,11 +355,17 @@ app.post("/manual-entry", cors(corsFromSite), async (request, response) => {
 });
 
 app.get("/check-auth", cors(corsFromSite), async (request, response) => {
-  let { authorized } = await checkAuth(request);
+  let {
+    authorized
+  } = await checkAuth(request);
   if (authorized) {
-    response.status(200).send({ success: true });
+    response.status(200).send({
+      success: true
+    });
   } else {
-    response.status(401).send({ success: false });
+    response.status(401).send({
+      success: false
+    });
   }
 });
 
@@ -355,8 +382,14 @@ const getTransporter = () => {
 };
 
 app.post("/contact-email", cors(corsOpen), async (request, response) => {
-  const { name, email, message } = request.body.data.form;
-  const { token } = request.body.data;
+  const {
+    name,
+    email,
+    message
+  } = request.body.data.form;
+  const {
+    token
+  } = request.body.data;
   const SECRET_KEY = process.env.RECAPTCHA_SECRET_KEY;
   const transporter = getTransporter();
 
@@ -437,7 +470,10 @@ app.post(
 );
 
 app.get("/sites", cors(corsFromSite), async (request, response) => {
-  let { authorized, userData } = await checkAuth(request);
+  let {
+    authorized,
+    userData
+  } = await checkAuth(request);
 
   const sitesRef = db.collection("sites");
   const snapshot = await sitesRef.get();
@@ -445,7 +481,9 @@ app.get("/sites", cors(corsFromSite), async (request, response) => {
   let data = snapshot.docs.map((doc) => doc.data());
   if (!authorized || !userData.email == "llanollano2021@yahoo.com") {
     data = data.map((doc) => {
-      return Object.assign({}, doc, { admin: undefined });
+      return Object.assign({}, doc, {
+        admin: undefined
+      });
     });
   }
 
@@ -466,10 +504,17 @@ async function checkAuth(request) {
         .verifyIdToken(request.headers.authorization);
       authorized = true;
     } catch (e) {
-      return { authorized: authorized, userData: userData, error: e };
+      return {
+        authorized: authorized,
+        userData: userData,
+        error: e
+      };
     }
   }
-  return { authorized: authorized, userData: userData };
+  return {
+    authorized: authorized,
+    userData: userData
+  };
 }
 // async function generatePaypalAccessToken() {
 //   try {

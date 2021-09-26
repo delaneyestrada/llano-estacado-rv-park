@@ -26,13 +26,13 @@
             </div>
           </template>
         </b-carousel-slide> -->
-        <b-carousel-slide img-src="@/static/camper-site.jpg">
-        </b-carousel-slide>
-        <b-carousel-slide img-src="@/static/front-rv-parked.jpg">
-        </b-carousel-slide>
         <b-carousel-slide img-src="@/static/side-rv-parked.jpg">
         </b-carousel-slide>
         <b-carousel-slide img-src="@/static/electrical.jpg"> </b-carousel-slide>
+        <b-carousel-slide img-src="@/static/site1.jpg"> </b-carousel-slide>
+        <b-carousel-slide img-src="@/static/site2.jpg"> </b-carousel-slide>
+        <b-carousel-slide img-src="@/static/site3.jpg"> </b-carousel-slide>
+        <b-carousel-slide img-src="@/static/site4.jpg"> </b-carousel-slide>
       </b-carousel>
       <b-card no-body>
         <div
@@ -120,7 +120,7 @@ export default {
     padding: 4rem;
   }
 
-  #carousel-1 * {
+  #carousel-1 img {
     height: 40vh;
     background-color: $dark;
   }
